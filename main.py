@@ -1,16 +1,11 @@
 def main():
-    import json
-    import os
+    from src.model import Model
+    from src.view import View
+    from src.controler import Controler
 
-    config = None
-
-    configFileName = os.path.join(os.path.dirname(__file__), 'config.json')
-    with open(configFileName) as file:
-        config = json.loads(file.read())
-
-    print(config)
-    print(type(config))
-    print(config['main']['font'])
+    model = Model()
+    view = View()
+    controler = Controler(view, model)
 
 
 if __name__ == "__main__":

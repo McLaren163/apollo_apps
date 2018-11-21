@@ -1,0 +1,13 @@
+{
+  "fonts": {
+    "gui": [
+      "Calibri",
+      "10"
+    ],
+    "gui-bold": [
+      "Calibri",
+      "10",
+      "bold"
+    ]
+  }
+}
