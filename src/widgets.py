@@ -13,7 +13,7 @@ class LabelEntry(tk.Frame):
     values - тип ввода данных, значение None для Entry или значение ('value1','value2','value3') для ComboBox
     """
 
-    def __init__(self, parent, text, values=None, width=tk.LABEL_WIDTH):
+    def __init__(self, parent, text, values=None, width=tk.LABEL_WIDTH, font=None):
         tk.Frame.__init__(self, parent)
 
         lbl = tk.Label(self, text=(text + ':'),
