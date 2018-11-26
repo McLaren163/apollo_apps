@@ -3,84 +3,99 @@ from tkinter.filedialog import asksaveasfilename
 # from tkinter.simpledialog import askinteger, askstring
 from tkinter.ttk import Combobox
 # from tkinter import Notebook
-from PIL.ImageTk import PhotoImage, Image
+# from PIL.ImageTk import PhotoImage, Image
 # from config import *
 
 
-class LabelEntry(tk.Frame):
+class Input(tk.Frame):
     """
-    text - текст метки
-    values - тип ввода данных, значение None для Entry или значение ('value1','value2','value3') для ComboBox
+    parent - родительский виджет
+    name - текст метки
+    values - тип ввода данных, значение None для Entry или 
+             значение ('value1','value2','value3') для ComboBox
+    width - ширина метки
+    font - шрифт
     """
 
-    def __init__(self, parent, text, values=None, width=tk.LABEL_WIDTH, font=None):
+    def __init__(self, parent, name, values=None, width=None, font=None):
         tk.Frame.__init__(self, parent)
 
-        lbl = tk.Label(self, text=(text + ':'),
-                       width=width, anchor=tk.W, font=FONT_DEF)
+        lbl = tk.Label(self, text=(name + ':'),
+                       anchor=tk.W, width=width, font=font)
         lbl.pack(side=tk.LEFT)
 
         self.var = tk.StringVar()
 
         if not values:
-            ent = tk.Entry(self, textvariable=self.var, justify=tk.CENTER, font=FONT_DEF)
+            ent = tk.Entry(self, textvariable=self.var,
+                           justify=tk.CENTER, font=font)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         elif values == '>Date<':
-            tk.Button(self, text='...', font=FONT_DEF).pack(
-                side=tk.RIGHT)  # TODO настройить комманду на колендарь
+            tk.Button(self, text='...', font=font).pack(
+                      side=tk.RIGHT)  # TODO настройить комманду на колендарь
             ent = tk.Entry(self, textvariable=self.var,
-                           justify=tk.CENTER, font=FONT_DEF)
+                           justify=tk.CENTER, font=font)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         else:
-            cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, font=FONT_DEF,
-                              values=values, state='readonly')
-            #cmbbox.current(0)
+            cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
+                              font=font, values=values, state='readonly')
+            # cmbbox.current(0)
             cmbbox.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
 
 
-class LabelEntryBlock(tk.Frame):
+class InputsBlock(tk.Frame):
     """
     param (именованные аргументы):
         name - заголовок блока
-        labels - описание блока ('имя1',
-                                 'имя2',
-                                ['имя3', ('значение1',
+        columns - число столбцов в блоке
+        inputs - описание блока (('имя1', None),
+                                 ('имя2', ('значение1',
                                           'значение2',
-                                          'значение3')],
+                                          'значение3'))),
     """
-    def __init__(self, parent, **param):
+    def __init__(self, parent, input_name_width, input_font, block_font, param):
         super().__init__(parent)
-        self.name = param['name']
-        tk.Label(self, text=self.name, font=FONT_BLOCK,
+        tk.Label(self, text=param['name'], font=block_font,
                  anchor=tk.W).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
-        self._makeWidgets(param)
+        self._makeWidgets(input_name_width, input_font, param)
 
-    def _makeWidgets(self, param):
-        self.labels = {}
-        self.vars = []
-        for label in param['labels']:
-            if type(label) is list:
-                name = label[0]
-                values = label[1]
-            else:
-                name = label
-                values = None
+    def _makeWidgets(self, name_width, font, param):
+        block_frame = tk.Frame(self)
+        columns = getFrameColumns(block_frame, param['columns'])
+        input_blocks = []
 
-            widget = LabelEntry(self, name, values)
-            widget.pack(expand=tk.YES, fill=tk.X)
-            self.labels[name] = widget.var
+        for parametrs in param['inputs']:
+            block = Input(parent=None,
+                          name=parametrs[0],
+                          values=parametrs[1],
+                          width=name_width,
+                          font=font)
+            input_blocks.append(block)
+
+        col_index = 0
+        for block in input_blocks:
+            block.master = columns[col_index]
+            block.pack(side=tk.TOP, fill=tk.X)
+            col_index += 1
+            if col_index >= len(columns):
+                col_index = 0
+
+        block_frame.pack(side=tk.TOP, fill=tk.X)
 
     def getDict(self):
-        result = {}
-        for key in self.labels:
-            result[key] = self.labels[key].get()
-        return result
+        pass
 
     def setValues(self, values_dict):
-        for key in values_dict:
-            var = self.labels.get(key)
-            if var:
-                var.set(values_dict[key])
+        pass
+
+
+def getFrameColumns(parent, number):
+    frames = []
+    for n in range(int(number)):
+        fr = tk.Frame(parent)
+        fr.grid(row=0, column=n, sticky='new', padx=3, pady=3)
+        frames.append(fr)
+    return frames
 
 
 class ListBoxTable(tk.Frame):

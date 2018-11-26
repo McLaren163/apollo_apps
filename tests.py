@@ -6,6 +6,7 @@ def test_json():
     with open('view_config.json') as file:
         conf = json.load(file)
     print(conf['files']['icon'])
+    print(conf['fonts']['gui'])
 
 
 if __name__ == "__main__":

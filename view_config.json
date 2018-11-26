@@ -1,4 +1,6 @@
 {
+  "width": 600,
+  "height": 600,
   "fonts": {
     "gui": [
       "Calibri",
@@ -11,6 +13,34 @@
     ]
   },
   "files": {
-    "icon": ".\\res\\icon\\icon.ico"
+    "icon": ".\\res\\icons\\logo.ico"
+  },
+  "blocks": {
+    "order": {
+      "name": "Информация о заказе",
+      "columns": 2,
+      "inputs": [
+        [
+          "№ Заказа",
+          null
+        ],
+        [
+          "Заказчик",
+          null
+        ],
+        [
+          "Дата",
+          null
+        ],
+        [
+          "Инженер",
+          [
+            "Баганов",
+            "Хасаншин",
+            "Безруков"
+          ]
+        ]
+      ]
+    }
   }
 }
