@@ -9,5 +9,8 @@
       "10",
       "bold"
     ]
+  },
+  "files": {
+    "icon": ".\\res\\icon\\icon.ico"
   }
 }
