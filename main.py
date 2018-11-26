@@ -4,8 +4,9 @@ def main():
     from src.controler import Controler
 
     model = Model()
-    view = View()
-    controler = Controler(view, model)
+    view = View(300, 300)
+    Controler(view, model)
+    view.mainloop()
 
 
 if __name__ == "__main__":
