@@ -44,7 +44,7 @@ class Input(tk.Frame):
             cmbbox.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
 
 
-class InputsBlock(tk.Frame):
+class InputsBlock(tk.LabelFrame):
     """
     param (именованные аргументы):
         name - заголовок блока
@@ -55,10 +55,7 @@ class InputsBlock(tk.Frame):
                                           'значение3'))),
     """
     def __init__(self, parent, input_name_width, input_font, block_font, param):
-        super().__init__(parent)
-        lbl = tk.Label(self, text=param['text'], font=block_font,
-                       anchor=tk.W)
-        lbl.pack(side=tk.TOP, expand=tk.NO, fill=tk.X)
+        super().__init__(parent, text=param['text'], font=block_font)
         self._makeWidgets(input_name_width, input_font, param)
 
     def _makeWidgets(self, input_name_width, font, param):
