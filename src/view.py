@@ -12,7 +12,7 @@ class View(tk.Frame):
         self.master.title('Откатные ворота "АПОЛЛО"')
         self.master.iconbitmap(config['files']['icon'])
         self.create_widgets(config)
-        self.pack()
+        self.pack(fill=tk.X)
 
     def create_widgets(self, config):
         InputsBlock(self,

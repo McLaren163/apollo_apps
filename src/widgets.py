@@ -59,8 +59,8 @@ class InputsBlock(tk.LabelFrame):
         self._makeWidgets(input_name_width, input_font, param)
 
     def _makeWidgets(self, input_name_width, font, param):
-        block_frame = tk.Frame(self)
-        columns = getFrameColumns(block_frame, param['columns'])
+        # block_frame = tk.Frame(self)
+        columns = getFrameColumns(self, param['columns'])
         col_index = 0
 
         for parametrs in param['inputs']:
@@ -73,7 +73,7 @@ class InputsBlock(tk.LabelFrame):
             if col_index >= len(columns):
                 col_index = 0
 
-        block_frame.pack(expand=tk.YES, fill=tk.X)
+        # block_frame.pack(expand=tk.YES, fill=tk.X)
 
     def getDict(self):
         pass
