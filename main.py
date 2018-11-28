@@ -10,8 +10,6 @@ def main():
     conf = None
     with open(CONFIG_FILE, 'r', encoding='utf8') as file:
         conf = json.load(file)
-    print(conf)
-    print(type(conf['width']))
 
     model = Model()
     view = View(conf)

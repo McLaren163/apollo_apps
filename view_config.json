@@ -1,6 +1,7 @@
 {
-  "width": 600,
-  "height": 600,
+  "win_width": 600,
+  "win_height": 600,
+  "label_width": 17,
   "fonts": {
     "gui": [
       "Calibri",
@@ -17,29 +18,98 @@
   },
   "blocks": {
     "order": {
-      "name": "Информация о заказе",
+      "text": "Информация о заказе",
       "columns": 2,
       "inputs": [
-        [
-          "№ Заказа",
-          null
-        ],
-        [
-          "Заказчик",
-          null
-        ],
-        [
-          "Дата",
-          null
-        ],
-        [
-          "Инженер",
-          [
-            "Баганов",
-            "Хасаншин",
-            "Безруков"
+        {
+          "id": "order",
+          "text": "№ Заказа",
+          "values": null
+        },
+        {
+          "id": "engineer",
+          "text": "Инженер",
+          "values": null
+        },
+        {
+          "id": "customer",
+          "text": "Заказчик",
+          "values": null
+        },
+        {
+          "id": "date",
+          "text": "Дата",
+          "values": null
+        }
+      ]
+    },
+    "product": {
+      "text": "Параметры ворот",
+      "columns": 2,
+      "inputs": [
+        {
+          "id": "width",
+          "text": "Ширина",
+          "values": null
+        },
+        {
+          "id": "cliarance",
+          "text": "Просвет",
+          "values": null
+        },
+        {
+          "id": "height",
+          "text": "Высота",
+          "values": null
+        },
+        {
+          "id": "shift_width",
+          "text": "Откат",
+          "values": null
+        },
+        {
+          "id": "console",
+          "text": "Консоль",
+          "values": [
+            "Треугольная",
+            "Прямоугольная"
           ]
-        ]
+        },
+        {
+          "id": "kit",
+          "text": "Комплектация",
+          "values": [
+            "ЭКО",
+            "ЕВРО"
+          ]
+        },
+        {
+          "id": "frame",
+          "text": "Рама",
+          "values": [
+            "60х40",
+            "80х40"
+          ]
+        },
+        {
+          "id": "frame_color",
+          "text": "Цвет рамы",
+          "values": null
+        },
+        {
+          "id": "filling",
+          "text": "Наполнение",
+          "values": [
+            "Профлист 1ст",
+            "Профлист 2ст",
+            "Металлосайдинг"
+          ]
+        },
+        {
+          "id": "filling_color",
+          "text": "Цвет наполнения",
+          "values": null
+        }
       ]
     }
   }

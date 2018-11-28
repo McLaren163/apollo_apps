@@ -11,14 +11,17 @@ class View(tk.Frame):
         setAskOnCloseWin(self.master)
         self.master.title('Откатные ворота "АПОЛЛО"')
         self.master.iconbitmap(config['files']['icon'])
-        self.master.width = config['width']
-        self.master.height = config['height']
         self.create_widgets(config)
         self.pack()
 
     def create_widgets(self, config):
         InputsBlock(self,
-                    17,
+                    config['label_width'],
                     config['fonts']['gui'],
                     config['fonts']['gui-bold'],
-                    config['blocks']['order']).pack()
+                    config['blocks']['order']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        InputsBlock(self,
+                    config['label_width'],
+                    config['fonts']['gui'],
+                    config['fonts']['gui-bold'],
+                    config['blocks']['product']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)

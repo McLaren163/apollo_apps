@@ -17,10 +17,11 @@ class Input(tk.Frame):
     font - шрифт
     """
 
-    def __init__(self, parent, name, values=None, width=None, font=None):
+    def __init__(self, parent, id, text, values=None, width=None, font=None):
+        self.id = id
         tk.Frame.__init__(self, parent)
 
-        lbl = tk.Label(self, text=(name + ':'),
+        lbl = tk.Label(self, text=(text + ':'),
                        anchor=tk.W, width=width, font=font)
         lbl.pack(side=tk.LEFT)
 
@@ -55,32 +56,27 @@ class InputsBlock(tk.Frame):
     """
     def __init__(self, parent, input_name_width, input_font, block_font, param):
         super().__init__(parent)
-        tk.Label(self, text=param['name'], font=block_font,
-                 anchor=tk.W).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        lbl = tk.Label(self, text=param['text'], font=block_font,
+                       anchor=tk.W)
+        lbl.pack(side=tk.TOP, expand=tk.NO, fill=tk.X)
         self._makeWidgets(input_name_width, input_font, param)
 
-    def _makeWidgets(self, name_width, font, param):
+    def _makeWidgets(self, input_name_width, font, param):
         block_frame = tk.Frame(self)
         columns = getFrameColumns(block_frame, param['columns'])
-        input_blocks = []
+        col_index = 0
 
         for parametrs in param['inputs']:
-            block = Input(parent=None,
-                          name=parametrs[0],
-                          values=parametrs[1],
-                          width=name_width,
-                          font=font)
-            input_blocks.append(block)
-
-        col_index = 0
-        for block in input_blocks:
-            block.master = columns[col_index]
-            block.pack(side=tk.TOP, fill=tk.X)
+            block = Input(parent=columns[col_index],
+                          width=input_name_width,
+                          font=font,
+                          **parametrs)
+            block.pack(side=tk.TOP, fill=tk.X, padx=1, pady=1)
             col_index += 1
             if col_index >= len(columns):
                 col_index = 0
 
-        block_frame.pack(side=tk.TOP, fill=tk.X)
+        block_frame.pack(expand=tk.YES, fill=tk.X)
 
     def getDict(self):
         pass
@@ -92,6 +88,7 @@ class InputsBlock(tk.Frame):
 def getFrameColumns(parent, number):
     frames = []
     for n in range(int(number)):
+        parent.columnconfigure(n, weight=1)
         fr = tk.Frame(parent)
         fr.grid(row=0, column=n, sticky='new', padx=3, pady=3)
         frames.append(fr)
