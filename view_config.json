@@ -37,7 +37,7 @@
         },
         {
           "id": "date",
-          "text": "Дата",
+          "text": "Дата монтажа",
           "values": null
         }
       ]
@@ -47,22 +47,22 @@
       "inputs": [
         {
           "id": "width",
-          "text": "Ширина",
+          "text": "Ширина, мм",
           "values": null
         },
         {
           "id": "cliarance",
-          "text": "Просвет",
+          "text": "Просвет, мм",
           "values": null
         },
         {
           "id": "height",
-          "text": "Высота",
+          "text": "Высота, мм",
           "values": null
         },
         {
           "id": "shift_width",
-          "text": "Место откат",
+          "text": "Место откат, мм",
           "values": null
         },
         {
@@ -114,14 +114,17 @@
       "text": "Комплектация",
       "inputs": [
         {
-          "id": "door",
-          "text": "Встроенная калитка",
-          "values": ">Boolean<"
+          "id": "support_beam",
+          "text": "Опорная балка",
+          "values": [
+            "Без опорной балки",
+            "Опорная балка"
+          ]
         },
         {
-          "id": "decor",
-          "text": "Переменный щит",
-          "values": ">Boolean<"
+          "id": "rack",
+          "text": "Зубчатая рейка, шт",
+          "values": null
         },
         {
           "id": "reception_column",
@@ -143,43 +146,45 @@
         },
         {
           "id": "reception_column_height",
-          "text": "Высота",
+          "text": "Высота, мм",
           "values": null
         },
         {
           "id": "console_column_height",
-          "text": "Высота",
+          "text": "Высота, мм",
           "values": null
         },
         {
           "id": "reception_column_num",
-          "text": "Количество",
+          "text": "Количество, шт",
           "values": null
         },
         {
           "id": "console_column_num",
-          "text": "Количество",
-          "values": null
-        },
-        {
-          "id": "support_beam",
-          "text": "Опорная балка",
-          "values": [
-            "Без опорной балки",
-            "Опорная балка"
-          ]
-        },
-        {
-          "id": "rack",
-          "text": "Зубчатая рейка",
+          "text": "Количество, шт",
           "values": null
         },
         {
           "id": "lock",
           "text": "Задвижка DH",
           "values": ">Boolean<"
+        },
+        {
+          "id": "door",
+          "text": "Встроенная калитка",
+          "values": ">Boolean<"
+        },
+        {
+          "id": "decor",
+          "text": "Переменный щит",
+          "values": ">Boolean<"
         }
       ]
+    },
+    "comments": {
+      "id": "comments",
+      "text": "Комментарий",
+      "rows": 5
     }
   }
 }

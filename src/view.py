@@ -1,7 +1,7 @@
 
 import tkinter as tk
 from src.quitter import setAskOnCloseWin
-from src.widgets import InputsBlock
+from src.widgets import InputsBlock, TextBlock, AboutLabel
 
 
 class View(tk.Frame):
@@ -15,6 +15,13 @@ class View(tk.Frame):
         self.pack(fill=tk.X)
 
     def create_widgets(self, config):
+        buttons_frame = tk.Frame(self)
+        AboutLabel(buttons_frame, font=config['fonts']['gui']).pack(
+            side=tk.LEFT)
+        tk.Button(buttons_frame, text='Чертеж', 
+                  font=config['fonts']['gui']).pack(side=tk.RIGHT, padx=1, pady=2)
+        buttons_frame.pack(side=tk.BOTTOM, fill=tk.X)
+
         blocks = config['blocks']
 
         InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
@@ -26,3 +33,6 @@ class View(tk.Frame):
         InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
                     config['fonts']['gui-bold'],
                     blocks['options']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        TextBlock(self, config['fonts']['gui'],
+                  config['fonts']['gui-bold'],
+                  blocks['comments']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
