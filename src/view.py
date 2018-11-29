@@ -15,13 +15,14 @@ class View(tk.Frame):
         self.pack(fill=tk.X)
 
     def create_widgets(self, config):
-        InputsBlock(self,
-                    config['label_width'],
-                    config['fonts']['gui'],
+        blocks = config['blocks']
+
+        InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
                     config['fonts']['gui-bold'],
-                    config['blocks']['order']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
-        InputsBlock(self,
-                    config['label_width'],
-                    config['fonts']['gui'],
+                    blocks['order']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
                     config['fonts']['gui-bold'],
-                    config['blocks']['product']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+                    blocks['product']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
+                    config['fonts']['gui-bold'],
+                    blocks['options']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)

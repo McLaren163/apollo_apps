@@ -23,7 +23,7 @@ class Input(tk.Frame):
 
         lbl = tk.Label(self, text=(text + ':'),
                        anchor=tk.W, width=width, font=font)
-        lbl.pack(side=tk.LEFT)
+        lbl.pack(side=tk.LEFT, pady=1)
 
         self.var = tk.StringVar()
 
@@ -37,6 +37,9 @@ class Input(tk.Frame):
             ent = tk.Entry(self, textvariable=self.var,
                            justify=tk.CENTER, font=font)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+        elif values == '>Boolean<':
+            ent = tk.Checkbutton(self, onvalue=True, offvalue=False)
+            ent.pack(expand=tk.YES)
         else:
             cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
                               font=font, values=values, state='readonly')
@@ -54,20 +57,21 @@ class InputsBlock(tk.LabelFrame):
                                           'значение2',
                                           'значение3'))),
     """
-    def __init__(self, parent, input_name_width, input_font, block_font, param):
-        super().__init__(parent, text=param['text'], font=block_font)
-        self._makeWidgets(input_name_width, input_font, param)
+    def __init__(self, parent, columns, input_name_width, input_font, 
+                 block_font, props):
+        super().__init__(parent, text=props['text'], font=block_font)
+        self._makeWidgets(columns, input_name_width, input_font, props)
 
-    def _makeWidgets(self, input_name_width, font, param):
+    def _makeWidgets(self, columns, input_name_width, font, props):
         # block_frame = tk.Frame(self)
-        columns = getFrameColumns(self, param['columns'])
+        columns = getFrameColumns(self, columns)
         col_index = 0
 
-        for parametrs in param['inputs']:
+        for input_props in props['inputs']:
             block = Input(parent=columns[col_index],
                           width=input_name_width,
                           font=font,
-                          **parametrs)
+                          **input_props)
             block.pack(side=tk.TOP, fill=tk.X, padx=1, pady=1)
             col_index += 1
             if col_index >= len(columns):
