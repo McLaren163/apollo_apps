@@ -182,9 +182,14 @@
       ]
     },
     "comments": {
-      "id": "comments",
       "text": "Комментарий",
-      "rows": 5
+      "inputs": [
+        {
+          "id": "comments",
+          "rows": 5,
+          "values": ">Text<"
+        }
+      ]
     }
   }
 }

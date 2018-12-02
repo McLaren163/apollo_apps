@@ -7,7 +7,15 @@ from tkinter.ttk import Combobox
 # from config import *
 
 
-class Input(tk.Frame):
+class InputMixin():
+    def getVariable(self):
+        return {self.id: {
+                    'text': self.text,
+                    'var': self.var
+                }}
+
+
+class Input(InputMixin, tk.Frame):
     """
     parent - родительский виджет
     name - текст метки
@@ -17,15 +25,16 @@ class Input(tk.Frame):
     font - шрифт
     """
 
-    def __init__(self, parent, id, text, values=None, width=None, font=None):
+    def __init__(self, parent, id, text=None, rows=None, values=None, width=None, font=None):
         self.id = id
+        self.var = tk.StringVar()
+
         tk.Frame.__init__(self, parent)
 
-        lbl = tk.Label(self, text=(text + ':'),
-                       anchor=tk.W, width=width, font=font)
-        lbl.pack(side=tk.LEFT, pady=1)
-
-        self.var = tk.StringVar()
+        if text:
+            lbl = tk.Label(self, text=(text + ':'),
+                           anchor=tk.W, width=width, font=font)
+            lbl.pack(side=tk.LEFT, pady=1)
 
         if not values:
             ent = tk.Entry(self, textvariable=self.var,
@@ -38,8 +47,12 @@ class Input(tk.Frame):
                            justify=tk.CENTER, font=font)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         elif values == '>Boolean<':
-            ent = tk.Checkbutton(self, onvalue=True, offvalue=False)
+            ent = tk.Checkbutton(self, variable=self.var, onvalue=1, offvalue=0)
             ent.pack(expand=tk.YES)
+        elif values == '>Text<':
+            ent = tk.Text(
+                self, height=rows, font=font, wrap=tk.WORD)
+            ent.pack(fill=tk.X)
         else:
             cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
                               font=font, values=values, state='readonly')
@@ -78,9 +91,6 @@ class InputsBlock(tk.LabelFrame):
                 col_index = 0
 
     def getDict(self):
-        pass
-
-    def setValues(self, values_dict):
         pass
 
 

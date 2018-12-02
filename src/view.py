@@ -33,6 +33,6 @@ class View(tk.Frame):
         InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
                     config['fonts']['gui-bold'],
                     blocks['options']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
-        TextBlock(self, config['fonts']['gui'],
-                  config['fonts']['gui-bold'],
-                  blocks['comments']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+        InputsBlock(self, 1, None, config['fonts']['gui'],
+                    config['fonts']['gui-bold'],
+                    blocks['comments']).pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
