@@ -25,39 +25,57 @@ class Input(InputMixin, tk.Frame):
     font - шрифт
     """
 
-    def __init__(self, parent, id, text=None, rows=None, values=None, width=None, font=None):
+    def __init__(self, parent, id, text=None, rows=None, values=None, label_width=None, font=None):
         self.id = id
-        self.var = tk.StringVar()
+        self.var = None
 
         tk.Frame.__init__(self, parent)
 
         if text:
             lbl = tk.Label(self, text=(text + ':'),
-                           anchor=tk.W, width=width, font=font)
+                           anchor=tk.W, label_width=width, font=font)
             lbl.pack(side=tk.LEFT, pady=1)
 
         if not values:
+            self.var = tk.StringVar()
             ent = tk.Entry(self, textvariable=self.var,
                            justify=tk.CENTER, font=font)
             ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-        elif values == '>Date<':
-            tk.Button(self, text='...', font=font).pack(
-                      side=tk.RIGHT)  # TODO настройить комманду на колендарь
-            ent = tk.Entry(self, textvariable=self.var,
-                           justify=tk.CENTER, font=font)
-            ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+        # elif values == '>Date<':
+        #     tk.Button(self, text='...', font=font).pack(
+        #               side=tk.RIGHT)  # TODO настройить комманду на колендарь
+        #     ent = tk.Entry(self, textvariable=self.var,
+        #                    justify=tk.CENTER, font=font)
+        #     ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         elif values == '>Boolean<':
+            self.var = tk.BooleanVar()
             ent = tk.Checkbutton(self, variable=self.var, onvalue=1, offvalue=0)
             ent.pack(expand=tk.YES)
         elif values == '>Text<':
             ent = tk.Text(
                 self, height=rows, font=font, wrap=tk.WORD)
             ent.pack(fill=tk.X)
+            self.var = TextVar(ent)
         else:
             cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
                               font=font, values=values, state='readonly')
             # cmbbox.current(0)
             cmbbox.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+
+    def getVar(self):
+        return {self.id: self.var}
+
+
+class TextVar():
+    def __init__(self, text_widget):
+        self.text = text_widget
+
+    def get(self):
+        return self.text.get('1.0', 'end').strip()
+
+    def set(self, value):
+        self.text.delete(1.0, 'end')
+        self.text.insert(1.0, value)
 
 
 class InputsBlock(tk.LabelFrame):
@@ -73,6 +91,7 @@ class InputsBlock(tk.LabelFrame):
     def __init__(self, parent, columns, input_name_width, input_font, 
                  block_font, props):
         super().__init__(parent, text=props['text'], font=block_font)
+        self.vars = {}
         self._makeWidgets(columns, input_name_width, input_font, props)
 
     def _makeWidgets(self, columns, input_name_width, font, props):
@@ -86,34 +105,13 @@ class InputsBlock(tk.LabelFrame):
                           font=font,
                           **input_props)
             block.pack(side=tk.TOP, fill=tk.X, padx=1, pady=1)
+            self.vars.update(block.getVar())
             col_index += 1
             if col_index >= len(columns):
                 col_index = 0
 
-    def getDict(self):
-        pass
-
-
-class TextBlock(tk.LabelFrame):
-    def __init__(self, parent, input_font,
-                 block_font, props):
-        super().__init__(parent, text=props['text'], font=block_font)
-        self._makeWidgets(input_font, props)
-
-    def _makeWidgets(self, input_font, props):
-        self.text = tk.Text(self, height=props['rows'], font=input_font, wrap=tk.WORD)
-        self.text.pack(fill=tk.X)
-
-    def getDict(self):
-        result = []
-        text = self.text.get('1.0', 'end')
-        text = text.strip()
-        col = []
-        for line in text.split('\n'):
-            if line:
-                col.append(line)
-        result.append(col)
-        return {self.name: result}
+    def getVars(self):
+        return self.vars.copy()
 
 
 def getFrameColumns(parent, number):
@@ -124,6 +122,13 @@ def getFrameColumns(parent, number):
         fr.grid(row=0, column=n, sticky='new', padx=3, pady=3)
         frames.append(fr)
     return frames
+
+
+class AboutLabel(tk.Label):
+    def __init__(self, parent, **props):
+        super().__init__(parent, **props)
+        self.configure(text='Apollo | Makarov A.S.',
+                       anchor=tk.W, fg='#555555', relief=tk.GROOVE)
 
 
 class PreviewWin(tk.Toplevel):
@@ -159,8 +164,3 @@ class PreviewWin(tk.Toplevel):
                 self.image.save(file, 'PNG')
 
 
-class AboutLabel(tk.Label):
-    def __init__(self, parent, **props):
-        super().__init__(parent, **props)
-        self.configure(text='Apollo | Makarov A.S.',
-                       anchor=tk.W, fg='#555555', relief=tk.GROOVE)

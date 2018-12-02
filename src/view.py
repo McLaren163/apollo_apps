@@ -1,7 +1,7 @@
 
 import tkinter as tk
 from src.quitter import setAskOnCloseWin
-from src.widgets import InputsBlock, TextBlock, AboutLabel
+from src.widgets import InputsBlock, AboutLabel
 
 
 class View(tk.Frame):
@@ -18,7 +18,7 @@ class View(tk.Frame):
         buttons_frame = tk.Frame(self)
         AboutLabel(buttons_frame, font=config['fonts']['gui']).pack(
             side=tk.LEFT)
-        tk.Button(buttons_frame, text='Чертеж', 
+        tk.Button(buttons_frame, text='Чертеж',
                   font=config['fonts']['gui']).pack(side=tk.RIGHT, padx=1, pady=2)
         buttons_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
