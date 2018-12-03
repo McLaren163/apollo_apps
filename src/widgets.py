@@ -33,7 +33,7 @@ class Input(InputMixin, tk.Frame):
 
         if text:
             lbl = tk.Label(self, text=(text + ':'),
-                           anchor=tk.W, label_width=width, font=font)
+                           anchor=tk.W, width=label_width, font=font)
             lbl.pack(side=tk.LEFT, pady=1)
 
         if not values:
@@ -57,6 +57,7 @@ class Input(InputMixin, tk.Frame):
             ent.pack(fill=tk.X)
             self.var = TextVar(ent)
         else:
+            self.var = tk.StringVar()
             cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
                               font=font, values=values, state='readonly')
             # cmbbox.current(0)
@@ -101,7 +102,7 @@ class InputsBlock(tk.LabelFrame):
 
         for input_props in props['inputs']:
             block = Input(parent=columns[col_index],
-                          width=input_name_width,
+                          label_width=input_name_width,
                           font=font,
                           **input_props)
             block.pack(side=tk.TOP, fill=tk.X, padx=1, pady=1)
