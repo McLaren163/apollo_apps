@@ -2,9 +2,10 @@
 import tkinter as tk
 from src.quitter import setAskOnCloseWin
 from src.widgets import InputsBlock, AboutLabel
+from pymitter import EventEmitter
 
 
-class View(tk.Frame):
+class View(EventEmitter, tk.Frame):
     vars = {}
 
     def __init__(self, config):
@@ -21,7 +22,7 @@ class View(tk.Frame):
             side=tk.LEFT)
         button = tk.Button(buttons_frame, text='Чертеж',
                   font=config['fonts']['gui'])
-        button.bind('<Button-1>', self.onclick)
+        button.bind('<Button-1>', self.submit)
         button.pack(side=tk.RIGHT, padx=1, pady=2)
         
         buttons_frame.pack(side=tk.BOTTOM, fill=tk.X)
@@ -50,7 +51,20 @@ class View(tk.Frame):
         self.vars.update(bl.getVars())
         bl.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 
-    def onclick(self, event):
-        self.vars['order'].set('new order')
-        self.vars['comments'].set('new value')
-        self.vars['door'].set(False)
+    def setState(self, new_state):
+        for id, value in new_state.items():
+            var = self.vars.get(id)
+            if var:
+                var.set(value)
+
+    def getState(self):
+        state = {}
+        for id, var in self.vars.items():
+            state[id] = var.get()
+        return state
+
+    def submit(self, event):
+        # self.vars['order'].set('new order')
+        # self.vars['comments'].set('new value')
+        # self.vars['door'].set(False)
+        self.emit('submit', self.getState())
