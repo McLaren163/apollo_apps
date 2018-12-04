@@ -6,9 +6,11 @@ class Controler():
         self.subscribeOnEvents()
 
     def subscribeOnEvents(self):
-        self.view.on('submit', self.view_submit)
+        self.view.on('submit', self.view_submit_handler)
 
-    def view_submit(self, args):
+    def view_submit_handler(self, args):
         print('submit controller')
+        self.model.setState(args)
+        print('Model type: {}'.format(self.model.getType()))
         args['order'] = '666'
         self.view.setState(args)

@@ -56,9 +56,8 @@ class View(EventEmitter, tk.Frame):
 
     def setState(self, new_state):
         for id, value in new_state.items():
-            var = self.vars.get(id)
-            if var:
-                var.set(value)
+            if id in self.vars:
+                self.vars[id].set(value)
 
     def getState(self):
         state = {}
