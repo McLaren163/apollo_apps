@@ -21,33 +21,36 @@ class View(EventEmitter, tk.Frame):
         AboutLabel(buttons_frame, font=config['fonts']['gui']).pack(
             side=tk.LEFT)
         button = tk.Button(buttons_frame, text='Чертеж',
-                  font=config['fonts']['gui'])
+                           font=config['fonts']['gui'])
         button.bind('<Button-1>', self.submit)
         button.pack(side=tk.RIGHT, padx=1, pady=2)
-        
+
         buttons_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
         blocks = config['blocks']
 
-        bl = InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
-                    config['fonts']['gui-bold'],
-                    blocks['order'])
+        bl = InputsBlock(self, 2, config['label_width'],
+                         config['fonts']['gui'],
+                         config['fonts']['gui-bold'],
+                         blocks['order'])
         self.vars.update(bl.getVars())
         bl.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 
-        bl = InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
-                    config['fonts']['gui-bold'],
-                    blocks['product'])
+        bl = InputsBlock(self, 2, config['label_width'],
+                         config['fonts']['gui'],
+                         config['fonts']['gui-bold'],
+                         blocks['product'])
         self.vars.update(bl.getVars())
         bl.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
-        bl = InputsBlock(self, 2, config['label_width'], config['fonts']['gui'],
-                    config['fonts']['gui-bold'],
-                    blocks['options'])
+        bl = InputsBlock(self, 2, config['label_width'],
+                         config['fonts']['gui'],
+                         config['fonts']['gui-bold'],
+                         blocks['options'])
         self.vars.update(bl.getVars())
         bl.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
         bl = InputsBlock(self, 1, None, config['fonts']['gui'],
-                    config['fonts']['gui-bold'],
-                    blocks['comments'])
+                         config['fonts']['gui-bold'],
+                         blocks['comments'])
         self.vars.update(bl.getVars())
         bl.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
 

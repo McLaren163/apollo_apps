@@ -15,6 +15,7 @@ def main():
     view = View(conf)
     Controler(view, model)
     view.mainloop()
+    print('after mainloop')
 
 
 if __name__ == "__main__":
