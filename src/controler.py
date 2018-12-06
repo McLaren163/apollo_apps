@@ -7,10 +7,13 @@ class Controler():
 
     def subscribeOnEvents(self):
         self.view.on('submit', self.view_submit_handler)
+        self.model.on('bad props', self.model_bad_values)
+        self.model.on('new props', self.view.setState)
 
     def view_submit_handler(self, args):
         print('submit controller')
-        self.model.setState(args)
-        print('Model type: {}'.format(self.model.getType()))
-        args['order'] = '666'
+        self.model.isValid(args)
+
+    def model_bad_values(self, args):
+        print('bad props controller')
         self.view.setState(args)
