@@ -34,7 +34,21 @@ def test_model_map():
     print(mm.getType(4100, 3500))
 
 
+def callback(event):
+    print(event)
+
+def test_events():
+    root = tk.Tk()
+    entry = tk.Entry(root)
+    entry.bind('<Return>', callback)
+    entry.bind('<FocusOut>', callback)
+    entry.pack()
+    tk.Entry(root).pack()
+    root.mainloop()
+
+
 if __name__ == "__main__":
     # test_json()
     # test_inputs()
-    test_model_map()
+    # test_model_map()
+    test_events()

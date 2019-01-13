@@ -6,7 +6,7 @@ from tkinter.ttk import Combobox
 # from PIL.ImageTk import PhotoImage, Image
 # from config import *
 
-
+# под вопросом нужен ли?
 class InputMixin():
     def getVariable(self):
         return {self.id: {
@@ -19,13 +19,14 @@ class Input(InputMixin, tk.Frame):
     """
     parent - родительский виджет
     name - текст метки
-    values - тип ввода данных, значение None для Entry или 
+    values - тип ввода данных, значение None для Entry или
              значение ('value1','value2','value3') для ComboBox
     width - ширина метки
     font - шрифт
     """
 
-    def __init__(self, parent, id, text=None, rows=None, values=None, label_width=None, font=None):
+    def __init__(self, parent, id, text=None, rows=None, values=None,
+                 label_width=None, font=None):
         self.id = id
         self.var = None
 
@@ -58,16 +59,17 @@ class Input(InputMixin, tk.Frame):
             self.var = TextVar(ent)
         else:
             self.var = tk.StringVar()
-            cmbbox = Combobox(self, textvariable=self.var, justify=tk.CENTER, 
+            ent = Combobox(self, textvariable=self.var, justify=tk.CENTER,
                               font=font, values=values, state='readonly')
-            # cmbbox.current(0)
-            cmbbox.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+            # ent.current(0)
+            ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
 
     def getVar(self):
         return {self.id: self.var}
 
 
 class TextVar():
+    """Объект переменной значения для виджета Text"""
     def __init__(self, text_widget):
         self.text = text_widget
 
@@ -89,7 +91,7 @@ class InputsBlock(tk.LabelFrame):
                                           'значение2',
                                           'значение3'))),
     """
-    def __init__(self, parent, columns, input_name_width, input_font, 
+    def __init__(self, parent, columns, input_name_width, input_font,
                  block_font, props):
         super().__init__(parent, text=props['text'], font=block_font)
         self.vars = {}

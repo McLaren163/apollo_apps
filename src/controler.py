@@ -8,7 +8,7 @@ class Controler():
     def subscribeOnEvents(self):
         self.view.on('submit', self.view_submit_handler)
         self.model.on('bad props', self.model_bad_values)
-        self.model.on('new props', self.view.setState)
+        # self.model.on('new props', self.view.setState)
 
     def view_submit_handler(self, args):
         print('submit controller')
