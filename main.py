@@ -1,14 +1,15 @@
-from src.config import view_config
+from src.config import shiftgate_view_config
 from src.config import TYPE_MAP_FILE
-from src.model import Model, ModelMap
-from src.view import View
-from src.controler import Controler
+from src.models import ShiftGateModel, ModelMap
+from src.views import ShiftGateView
+from src.controllers import Controller
+from src.validators import Validator
 
 
 def main():
-    model = Model(ModelMap(TYPE_MAP_FILE))
-    view = View(view_config)
-    controler = Controler(view, model)
+    model = ShiftGateModel(Validator(), ModelMap(TYPE_MAP_FILE))
+    view = ShiftGateView(shiftgate_view_config)
+    controller = Controller(view, model)
     view.mainloop()
 
 

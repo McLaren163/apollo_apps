@@ -1,0 +1,161 @@
+{
+  "title": "Откатные ворота \"АПОЛЛО\"",
+  "win_width": 600,
+  "win_height": 600,
+  "label_width": 18,
+  "fonts": {
+    "gui": [
+      "Calibri",
+      "10"
+    ],
+    "gui-bold": [
+      "Calibri",
+      "10",
+      "bold"
+    ]
+  },
+  "files": {
+    "icon": ".\\res\\icons\\logo.ico"
+  },
+  "inputs":
+    {
+      "order": {
+        "text": "№ Заказа",
+        "values": null
+    },
+      "engineer": {
+        "text": "Инженер",
+        "values": null
+    },
+      "customer": {
+        "text": "Заказчик",
+        "values": null
+    },
+      "date":{
+        "text": "Дата монтажа",
+        "values": null
+    },
+      "width": {
+        "text": "Ширина проема, мм",
+        "values": null
+    },
+      "full_width": {
+        "text": "Ширина полотна, мм",
+        "values": null
+      },
+      "cliarance": {
+        "text": "Просвет, мм",
+        "values": null
+    },
+      "height": {
+        "text": "Высота полотна, мм",
+        "values": null
+    },
+      "side": {
+        "text": "Вид со двора",
+        "values": [
+          "Вправо",
+          "Влево"
+        ]
+    },
+      "console": {
+        "text": "Консоль",
+        "values": [
+          "Треугольная",
+          "Прямоугольная"
+        ]
+    },
+      "kit": {
+        "text": "Комплектация",
+        "values": [
+          "SG01",
+          "МИКРО",
+          "ЭКО",
+          "ЕВРО"
+        ]
+    },
+      "frame": {
+        "text": "Рама",
+        "values": [
+          "60х40x2",
+          "80х40x2"
+        ]
+    },
+      "frame_color": {
+        "text": "Цвет рамы",
+        "values": null
+    },
+      "filling": {
+        "text": "Наполнение",
+        "values": [
+          "профлист СС10 шагрень 1ст",
+          "профлист СС10 шагрень 2ст",
+          "металлосайдинг с 2 сторон",
+          "металлосайдинг декор"
+        ]
+    },
+      "filling_color": {
+        "text": "Цвет наполнения",
+        "values": null
+    },
+      "support_beam": {
+        "text": "Опорная балка",
+        "values": [
+          "Без опорной балки",
+          "Опорная балка"
+        ]
+    },
+      "rack": {
+        "text": "Зубчатая рейка, шт",
+        "values": null
+    },
+      "reception_column": {
+        "text": "Приемный столб",
+        "values": [
+          "Стандартный",
+          "П-образный 60х40",
+          "П-образный 80х40"
+        ]
+    },
+      "console_column": {
+        "text": "От бокового качения",
+        "values": [
+          "Стандартный",
+          "П-образный 60х40",
+          "П-образный 80х40"
+        ]
+    },
+      "reception_column_height": {
+        "text": "Высота, мм",
+        "values": null
+    },
+      "console_column_height": {
+        "text": "Высота, мм",
+        "values": null
+    },
+      "reception_column_num": {
+        "text": "Количество, шт",
+        "values": null
+    },
+      "console_column_num": {
+        "text": "Количество, шт",
+        "values": null
+    },
+      "lock": {
+        "text": "Задвижка DH",
+        "values": ">Boolean<"
+    },
+      "door": {
+        "text": "Встроенная калитка",
+        "values": ">Boolean<"
+    },
+      "decor": {
+        "text": "Переменный щит",
+        "values": ">Boolean<"
+    },
+      "comments": {
+        "rows": 5,
+        "values": ">Text<"
+    }
+}
+}
