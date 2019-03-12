@@ -7,19 +7,23 @@ class Controller():
 
     def subscribeOnEvents(self):
         self.view.on('submit', self.submitHandler)
-        self.view.on('new value', self.checkValuesHandler)
+        self.view.on('new value', self.newValuesHandler)
 
-        self.model.on('new state', self.syncViewModelHandler)
+        self.model.on('new state', self.syncViewHandler)
         self.model.on('errors', self.errorsHandler)
+        self.model.on('return data', self.returnDataHandler)
 
-    def submitHandler(self, args):
-        self.model.isValid(args)
+    def submitHandler(self):
+        self.model.startCalculate()
 
-    def checkValuesHandler(self, args):
-        self.model.isValid(args)
+    def newValuesHandler(self, args):
+        self.model.setState(args)
 
     def errorsHandler(self, args):
         pass
 
-    def syncViewModelHandler(self, args):
+    def syncViewHandler(self, args):
         self.view.setState(args)
+
+    def returnDataHandler(self, args):
+        self.view.showResult(args)

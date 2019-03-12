@@ -12,7 +12,12 @@
       "Calibri",
       "10",
       "bold"
-    ]
+    ],
+    "pdf": {
+      "name": "Calibri",
+      "file": "./res/fonts/calibri.ttf",
+      "size": 14.0
+    }
   },
   "files": {
     "icon": ".\\res\\icons\\logo.ico"

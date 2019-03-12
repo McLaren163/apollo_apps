@@ -1,7 +1,10 @@
+import os
 import tkinter as tk
+from tkinter.filedialog import asksaveasfilename
 from src.quitter import setAskOnCloseWin
 from src.widgets import InputsBlockFrame, AboutLabel, Input
 from pymitter import EventEmitter
+from src.pdf_creator import PDFShiftgate
 
 
 def getCallback(emitter, value_id, name_event='new value'):
@@ -22,10 +25,11 @@ class View(EventEmitter, tk.Frame):
         setAskOnCloseWin(self.master)
         self.master.title(config['title'])
         self.master.iconbitmap(config['files']['icon'])
-        self.createWidgets(config)
+        self.config = config
+        self.createWidgets()
         self.pack(fill=tk.X)
 
-    def createWidgets(self, config):
+    def createWidgets(self):
         pass
 
     def setState(self, props):
@@ -49,7 +53,8 @@ class ShiftGateView(View):
     def __init__(self, args):
         super().__init__(args)
 
-    def createWidgets(self, config):
+    def createWidgets(self):
+        config = self.config
         inputs = config['inputs']
         font = config['fonts']['gui']
         font_block = config['fonts']['gui-bold']
@@ -96,7 +101,29 @@ class ShiftGateView(View):
 
 
     def submit(self, event):
-        self.emit('submit', self.getState())
+        self.emit('submit')
+
+    def showResult(self, data):
+        initial_filename = '{} - {}'.format(data.get('order'),
+                                            data.get('customer'))
+        pdf_name = choose_pdf_name(initial_filename)
+        if pdf_name:
+            self.create_pdf_file(data, pdf_name)
+            self.update() # обновить интерфейс
+            os.startfile(pdf_name)
+
+    def create_pdf_file(self, data, file_name):
+        font = self.config['fonts']['pdf']
+        pdf = PDFShiftgate(data, font['name'], font['file'], font['size'])
+        pdf.save(file_name)
+
+
+def choose_pdf_name(initial_name):
+    ftype = [('Document PDF', '*.pdf'),]
+    file_name = asksaveasfilename(filetypes=ftype,
+                                    initialfile=initial_name,
+                                    defaultextension='.pdf')
+    return file_name
 
 
 def insertInputsInBlock(block, col, conf, datadict, emitter, ids):
