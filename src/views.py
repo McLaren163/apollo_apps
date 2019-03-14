@@ -80,19 +80,44 @@ class ShiftGateView(View):
         block = InputsBlockFrame(self, 'Информация о заказе',
                                        2, label_w, font, font_block)
         insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['order', 'customer'])
+                            ['order',
+                            'customer'])
         insertInputsInBlock(block, 1, inputs, self.inputs, self,
-                            ['engineer', 'date'])
+                            ['engineer',
+                            'date'])
 
         block = InputsBlockFrame(self, 'Параметры ворот',
                                        2, label_w, font, font_block)
         insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['width', 'full_width', 'console', 'frame', 'filling'])
+                            ['width',
+                            'full_width',
+                            'console',
+                            'frame',
+                            'filling',
+                            'color_type'])
         insertInputsInBlock(block, 1, inputs, self.inputs, self,
-                            ['height', 'cliarance', 'side', 'kit',
-                             'frame_color', 'filling_color'])
+                            ['height',
+                            'cliarance',
+                            'side',
+                            'kit',
+                            'frame_color',
+                            'filling_color'])
 
-        # "text": "Комплектация"
+        block = InputsBlockFrame(self, 'Комплектация',
+                                       2, label_w, font, font_block)
+        insertInputsInBlock(block, 0, inputs, self.inputs, self,
+                            ['reception_column',
+                            'reception_column_height',
+                            'reception_column_num',
+                            'support_beam',
+                            'lock'])
+        insertInputsInBlock(block, 1, inputs, self.inputs, self,
+                            ['console_column',
+                            'console_column_height',
+                            'console_column_num',
+                            'rack',
+                            'door',
+                            'decor'])
 
         block = InputsBlockFrame(self, 'Комментарий',
                                        1, label_w, font, font_block)
@@ -108,11 +133,11 @@ class ShiftGateView(View):
                                             data.get('customer'))
         pdf_name = choose_pdf_name(initial_filename)
         if pdf_name:
-            self.create_pdf_file(data, pdf_name)
+            self.createPdfFile(data, pdf_name)
             self.update() # обновить интерфейс
             os.startfile(pdf_name)
 
-    def create_pdf_file(self, data, file_name):
+    def createPdfFile(self, data, file_name):
         font = self.config['fonts']['pdf']
         pdf = PDFShiftgate(data, font['name'], font['file'], font['size'])
         pdf.save(file_name)

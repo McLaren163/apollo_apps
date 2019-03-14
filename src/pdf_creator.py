@@ -27,12 +27,14 @@ class PDFShiftgate(FPDF):
         self.set_font_size(self.f_size)
 
         self.ln()
-        self.cell(epw // 3, 10, 'Заказ №: ' + self.data['order'],
+        self.cell(epw // 5, 10, 'Дата: ' + self.data['date'],
             border=1, align='L')
         self.cell(0, 10,
             'Откатные ворота ПРЕСТИЖ / ПРЕМИУМ (вид содвора)', border=1, align='C')
         self.ln()
-        self.cell(0, 10, 'Заказчик: ' + self.data['customer'], border=1, align='L')
+        self.cell(epw // 5, 10, 'Заказ: ' + self.data['order'], border=1, align='L')
+        self.cell(epw // 7 * 4, 10, 'Заказчик: ' + self.data['customer'], border=1, align='L')
+        self.cell(0, 10, 'Инженер: ' + self.data['engineer'], border=1, align='L')
 
     def save(self, file):
         self.createOnePage()
@@ -42,7 +44,7 @@ class PDFShiftgate(FPDF):
     def createOnePage(self):
         self.add_page('L')
         file = SGATE_IMG_CFG['s_types'][self.data['s_type']]
-        self.image(file, x=20, y=35, h=70)
+        self.image(file, x=25, y=35, h=90)
 
     def createTwoPage(self):
         pass
