@@ -3,14 +3,22 @@ from src.config import TYPE_MAP_FILE
 from src.models import ShiftGateModel, DesignModelMap
 from src.views import ShiftGateView
 from src.controllers import Controller
-from src.validators import Validator
+
+
+debugState = {'order': 'Order',
+              'customer': 'Customer',
+              'date': 'Date',
+              'engineer': 'Engineer',
+              'width': '4000',
+              'height': '2000',
+              'cliarance': '100'}
 
 
 def main():
-    model = ShiftGateModel(Validator(), DesignModelMap(TYPE_MAP_FILE))
+    model = ShiftGateModel(DesignModelMap(TYPE_MAP_FILE))
     view = ShiftGateView(shiftgate_view_config)
     controller = Controller(view, model)
-    view.mainloop()
+    controller.start(start_state=debugState)
 
 
 if __name__ == "__main__":

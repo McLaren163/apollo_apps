@@ -3,14 +3,18 @@
   "win_width": 600,
   "win_height": 600,
   "label_width": 18,
+  "size_text": [18, 1],
+  "size_input": [25, 1],
+  "size_combo": [22, 1],
+  "size_multiline": [45, 5],
   "fonts": {
     "gui": [
       "Calibri",
-      "10"
+      "8"
     ],
     "gui-bold": [
       "Calibri",
-      "10",
+      "8",
       "bold"
     ],
     "pdf": {
@@ -99,6 +103,10 @@
           "металлосайдинг декор"
         ]
     },
+      "filling_weight": {
+        "text": "Вес м2 наполнения, кг",
+        "values": null
+      },
       "filling_color": {
         "text": "Цвет наполнения",
         "values": null
@@ -111,11 +119,12 @@
           "Глянец"
         ]
     },
-      "support_beam": {
+      "beam": {
         "text": "Опорная балка",
         "values": [
           "Без опорной балки",
           "Опорная балка",
+          "Продольная закладная",
           "Нестандарт"
         ]
     },
@@ -140,24 +149,27 @@
         ]
     },
       "reception_column_height": {
-        "text": "Высота, мм",
+        "text": "Высота ПС, мм",
         "values": null
     },
       "console_column_height": {
-        "text": "Высота, мм",
+        "text": "Высота БК, мм",
         "values": null
     },
       "reception_column_num": {
-        "text": "Количество, шт",
+        "text": "Количество ПС, шт",
         "values": null
     },
       "console_column_num": {
-        "text": "Количество, шт",
+        "text": "Количество БК, шт",
         "values": null
     },
       "lock": {
         "text": "Задвижка DH",
-        "values": ">Boolean<"
+        "values": [
+            "НЕТ",
+            "ДА"
+        ]
     },
       "door": {
         "text": "Встроенная калитка",
@@ -168,7 +180,6 @@
         "values": ">Boolean<"
     },
       "comments": {
-        "rows": 5,
         "values": ">Text<"
     }
 }

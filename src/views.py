@@ -1,158 +1,181 @@
-import os
+import PySimpleGUI as sg
 import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
-from src.quitter import setAskOnCloseWin
-from src.widgets import InputsBlockFrame, AboutLabel, Input
+import os
+import subprocess
+import sys
 from pymitter import EventEmitter
 from src.pdf_creator import PDFShiftgate
 
 
-def getCallback(emitter, value_id, name_event='new value'):
-    """вернет функцию, которая будет вызывать событие name_event
-    у объекта emitter и передаст в него {value_id: new_value}"""
-    def wrap_callback(new_value):
-        """событие при установке нового значения"""
-        props = {value_id: new_value}
-        emitter.emit(name_event, props)
-    return wrap_callback
-
-
-class View(EventEmitter, tk.Frame):
-    inputs = {}
-
+class ShiftGateView(EventEmitter):
     def __init__(self, config):
         super().__init__()
-        setAskOnCloseWin(self.master)
-        self.master.title(config['title'])
-        self.master.iconbitmap(config['files']['icon'])
-        self.config = config
-        self.createWidgets()
-        self.pack(fill=tk.X)
+        self.cfg = config
 
-    def createWidgets(self):
-        pass
+    def run(self, state=None):
+        # create main window
+        title = self.cfg['title']
+        icon = self.cfg['files']['icon']
+        font = self.cfg['fonts']['gui']
+        button_color = ('black', 'darkgrey')
+        layout = self._createLayout(self.cfg)
+        self.window = sg.Window(title, icon=icon, font=font,
+                                element_padding=(0, 1),
+                                button_color=button_color).Layout(layout)
 
-    def setState(self, props):
-        """props = {id: value}"""
-        for id, value in props.items():
-            if id in self.inputs:
-                self.inputs[id].setValue(value)
+        if state:
+            self.setState(state)
 
-    def getState(self):
-        """return {id: value}"""
-        props = {}
-        for id, var in self.inputs.items():
-            props[id] = var.getValue()
-        return props
+        # run main event loop
+        while True:
+            event, values = self.window.Read()
+            if event is None:
+                break   # exit
+            elif event == 'submit_key':
+                self.emit('submit', values)
 
+        self.window.Close()
 
-class ShiftGateView(View):
-    """
-    docstring for ShiftGateView
-    """
-    def __init__(self, args):
-        super().__init__(args)
+    def _createLayout(self, layout_config):
+        insert = insertInputFabric(layout_config)
 
-    def createWidgets(self):
-        config = self.config
-        inputs = config['inputs']
-        font = config['fonts']['gui']
-        font_block = config['fonts']['gui-bold']
-        label_w = config['label_width']
+        order_c0 = [
+            insert('order'),
+            insert('customer')
+        ]
+        order_c1 = [
+            insert('engineer'),
+            insert('date')
+        ]
+        gate_c0 = [
+            insert('width'),
+            insert('full_width'),
+            insert('console', True),
+            insert('frame'),
+            insert('filling'),
+            insert('filling_weight'),
+        ]
+        gate_c1 = [
+            insert('height'),
+            insert('cliarance'),
+            insert('side'),
+            insert('kit'),
+            insert('frame_color'),
+            insert('filling_color'),
+            insert('color_type'),
+        ]
+        extra_c0 = [
+            insert('reception_column'),
+            insert('reception_column_height'),
+            insert('reception_column_num'),
+            insert('beam'),
+            insert('rack'),
+        ]
+        extra_c1 = [
+            insert('console_column'),
+            insert('console_column_height'),
+            insert('console_column_num'),
+            insert('lock'),
+            insert('door'),
+            insert('decor'),
+        ]
+        order_layout = [
+            [sg.Column(order_c0), sg.Column(order_c1)],
+        ]
+        gate_layout = [
+            [sg.Column(gate_c0), sg.Column(gate_c1)],
+        ]
+        extra_layout = [
+            [sg.Column(extra_c0), sg.Column(extra_c1)],
+        ]
+        comment_layout = [
+            insert('comments'),
+            # [sg.Multiline(size=self.cfg.get('size_multiline'))],
+        ]
 
+        # main layout
+        layout = [
+            [sg.Frame('Информация о заказе', order_layout)],
+            [sg.Frame('Параметры ворот', gate_layout)],
+            [sg.Frame('Комплектация', extra_layout)],
+            [sg.Frame('Комментарий', comment_layout)],
+            [sg.Button('Чертёж', key='submit_key')],
+        ]
+        return layout
 
-        ############ нижний бар с кнопкой submit ############
-
-        buttons_frame = tk.Frame(self)
-        AboutLabel(buttons_frame, font=font).pack(
-            side=tk.LEFT)
-
-        button = tk.Button(buttons_frame, text='Чертеж',
-                           font=font)
-        button.bind('<Button-1>', self.submit)
-        button.pack(side=tk.RIGHT, padx=1, pady=2)
-
-        buttons_frame.pack(side=tk.BOTTOM, fill=tk.X)
-
-
-        ############ блоки ввода значений ############
-
-        block = InputsBlockFrame(self, 'Информация о заказе',
-                                       2, label_w, font, font_block)
-        insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['order',
-                            'customer'])
-        insertInputsInBlock(block, 1, inputs, self.inputs, self,
-                            ['engineer',
-                            'date'])
-
-        block = InputsBlockFrame(self, 'Параметры ворот',
-                                       2, label_w, font, font_block)
-        insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['width',
-                            'full_width',
-                            'console',
-                            'frame',
-                            'filling',
-                            'color_type'])
-        insertInputsInBlock(block, 1, inputs, self.inputs, self,
-                            ['height',
-                            'cliarance',
-                            'side',
-                            'kit',
-                            'frame_color',
-                            'filling_color'])
-
-        block = InputsBlockFrame(self, 'Комплектация',
-                                       2, label_w, font, font_block)
-        insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['reception_column',
-                            'reception_column_height',
-                            'reception_column_num',
-                            'support_beam',
-                            'lock'])
-        insertInputsInBlock(block, 1, inputs, self.inputs, self,
-                            ['console_column',
-                            'console_column_height',
-                            'console_column_num',
-                            'rack',
-                            'door',
-                            'decor'])
-
-        block = InputsBlockFrame(self, 'Комментарий',
-                                       1, label_w, font, font_block)
-        insertInputsInBlock(block, 0, inputs, self.inputs, self,
-                            ['comments',])
-
-
-    def submit(self, event):
-        self.emit('submit')
+    def setState(self, values):
+        """
+        set all new values to view
+        """
+        self.window.Fill(values)
 
     def showResult(self, data):
-        initial_filename = '{} - {}'.format(data.get('order'),
-                                            data.get('customer'))
-        pdf_name = choose_pdf_name(initial_filename)
+        """
+        create and open pdf file from data
+        """
+        # get name for pdf file
+        pdf_name = self._choose_filename(data)
+        print('View.showResult:', pdf_name)
+        # create pdf file
         if pdf_name:
-            self.createPdfFile(data, pdf_name)
-            self.update() # обновить интерфейс
-            os.startfile(pdf_name)
+            self._createPdfFile(data, pdf_name)
+            # open pdf file
+            if sys.platform == 'win32':
+                os.startfile(pdf_name)
+            else:
+                subprocess.call(['xdg-open', pdf_name])
 
-    def createPdfFile(self, data, file_name):
-        font = self.config['fonts']['pdf']
-        pdf = PDFShiftgate(data, font['name'], font['file'], font['size'])
+    def showErrors(self, errors):
+        print('Errors')
+
+    def _createPdfFile(self, data, file_name):
+        """
+        create pdf object and save to file
+        """
+        font = self.cfg['fonts']['pdf']
+        pdf = PDFShiftgate(data, font)
         pdf.save(file_name)
 
+    def _choose_filename(self, data):
+        """
+        return file name
+        """
+        order = data.get('order', 'XXX')
+        customer = data.get('customer', 'XXXXXXXX')
+        initial_file = '{}-{}'.format(order,
+                                      customer)
+        ftypes = [('Document PDF', '*.pdf'), ]
+        file_name = tk.filedialog.asksaveasfilename(filetypes=ftypes,
+                                                    initialfile=initial_file,
+                                                    defaultextension='.pdf')
+        return file_name
 
-def choose_pdf_name(initial_name):
-    ftype = [('Document PDF', '*.pdf'),]
-    file_name = asksaveasfilename(filetypes=ftype,
-                                    initialfile=initial_name,
-                                    defaultextension='.pdf')
-    return file_name
+
+def insertInputFabric(config):
+    def wrap(_id, submit=False):
+        return insertInput(_id, submit, config)
+    return wrap
 
 
-def insertInputsInBlock(block, col, conf, datadict, emitter, ids):
-    for id in ids:
-        datadict[id] = block.insertInputWidget(col, conf[id],
-            getCallback(emitter, id))
-    block.pack(side=tk.TOP, expand=tk.YES, fill=tk.X)
+def insertInput(_id, submit, config):
+    s_txt = config['size_text']
+    s_inp = config['size_input']
+    s_cmb = config['size_combo']
+    s_mul = config['size_multiline']
+    element = config['inputs'][_id]
+    res = []
+
+    text = element.get('text')
+    if text:
+        res.append(sg.Text(text, size=s_txt, pad=(0, 4)))
+    values = element.get('values')
+    if not values:
+        res.append(sg.Input(size=s_inp, key=_id, change_submits=submit))
+    elif values == '>Text<':
+        res.append(sg.Multiline(size=s_mul, key=_id, change_submits=False))
+    elif values == '>Boolean<':
+        res.append(sg.Checkbox('', key=_id, change_submits=submit))
+    elif isinstance(values, (list, tuple)):
+        res.append(sg.Combo(values, size=s_cmb, default_value=' ', key=_id,
+                            change_submits=submit))
+    return res

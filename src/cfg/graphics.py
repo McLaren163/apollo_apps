@@ -1,8 +1,10 @@
-SGATE_IMG_CFG = {
-    's_types': {
-        'ATL': './/res//img//atl.png',
+import os
+
+GATE_IMAGES = {
+    'draft_files': {
+        'ATL': 'atl.png',
         'APL': '',
-        'ATR': './/res//img//atr.png',
+        'ATR': 'atr.png',
         'APL': '',
         'BPL': '',
         'BPL': '',
@@ -14,5 +16,12 @@ SGATE_IMG_CFG = {
         'EPL': '',
         'FPL': '',
         'FPL': '',
+    },
+    'beam_files': {
+        "Без опорной балки": 'xxx.png',
+        "Опорная балка": 'xxx.png',
+        "Продольная закладная": 'xxx.png',
+        "Нестандарт": 'xxx.png'
     }
 }
+

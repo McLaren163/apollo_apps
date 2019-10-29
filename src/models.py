@@ -3,44 +3,57 @@ import csv
 
 
 class ShiftGateModel(EventEmitter):
-
-    def __init__(self, validator, design_map):
+    def __init__(self, design_map):
         super().__init__()
         self.state = {}
-        self.change_state = True
-        # validator.resetState(self.state)
-        # self.validator = validator
+        # self.change_state = True
         self.design_map = design_map
 
-    def setState(self, props):
-        self.state.update(props)
-        # проверить новое значение и внести корректировки в существующие
-        self.change_state = True
-        self.emit('new state', self.state.copy())
+    # def setState(self, props):
+    #     self.state.update(props)
+    #     # проверить новое значение и внести корректировки в существующие
+    #     self.change_state = True
+    #     self.emit('new state', self.state.copy())
 
-    def startCalculate(self):
-        if self.change_state:
-            data = self.calcFullData()
-            self.state.update(data)
-            self.change_state = False
+    def calculate(self, data):
+        # clear model state
+        self.state.clear()
+        # update model state with external data
+        self.state.update(data)
+        # add empty error and attention lists to the model state
+        self.state['errors'] = []
+        self.state['attentions'] = []
+        # add draft type to the model state
+        self.addDraftTypeToState(data)
+
+        # send event with new data
         self.emit('return data', self.state.copy())
 
-    def getFType(self):
-        return None #FIXME
+    def addDraftTypeToState(self, data):
+        draft_type = self.getDraftType(data)
+        if draft_type:
+            self.state['draft_type'] = draft_type
+        else:
+            self.state['errors'].append(
+                'ОШИБКА: Нет подходящего чертежа.'
+            )
 
-    def getSType(self):
-        frame = self.getFrameType(self.state['width'], self.state['height'])
-        console = self.getConsoleType(self.state['console'])
-        side = self.getSideType(self.state['side'])
-        return (frame + console + side).upper()
+    def getFType(self, values):
+        return None  # FIXME
 
-    def getSideType(self, side):
-        if side == 'Влево':
+    def getDraftType(self, data):
+        frame = self.getFrameType(data['width'], data['height'])
+        console = self.getConsoleType(data['console'])
+        direction = self.getDirectionType(data['side'])
+        return (frame + console + direction).upper()
+
+    def getDirectionType(self, direction):
+        if direction == 'Влево':
             return 'L'
-        elif side == 'Вправо':
+        elif direction == 'Вправо':
             return 'R'
         else:
-            return None
+            return '_'
 
     def getConsoleType(self, console):
         if console == 'Треугольная':
@@ -56,9 +69,9 @@ class ShiftGateModel(EventEmitter):
         если не найдет, то вернет None
         """
         return self.design_map.getType(int(width),
-                                      int(height))
+                                       int(height))
 
-    def calcFullData(self):
+    def calcFullData(self, values):
         """
         вернет полные данные о модели для представления
         data: {
@@ -72,46 +85,49 @@ class ShiftGateModel(EventEmitter):
         new_data = {}
         attentions = []
 
-        s_type = self.getSType()
+        # тип чертежа вид содвора
+        s_type = self.getSType(values)
         if s_type:
-            new_data.update({'s_type': s_type})
+            new_data['s_type'] = s_type
 
-        f_type = self.getFType()
+        # тип чертежа вид сбоку
+        f_type = self.getFType(values)
         if f_type:
-            new_data.update({'f_type': f_type})
+            new_data['f_type'] = f_type
 
-        slices = self.calcSlices(s_type) # dict {тип трубы: длина куска}
+        # нарезка металла
+        slices = self.calcSlices(s_type)  # dict {тип трубы: длина куска}
 
+        # основные размеры чертежа
+        main_sizes = self.getMainSizes(values)
+        new_data['main_sizes'] = main_sizes
+
+        # вес составляющих ворот
         weight_gate = self.calcWeightGate(slices)
         weight_filling = self.calcWeightFilling(self.state.get('filling'))
-        full_weight = weight_filling + weight_gate
+        weight_bus = self.calcWeightBus()
+        weight_without_bus = weight_filling + weight_gate
+        new_data['weight_without_bus'] = weight_without_bus
+        full_weight = weight_without_bus + weight_bus
+        new_data['full_weight'] = full_weight
 
         new_data['attention'] = attentions
         return new_data
 
+    def getMainSizes(self, values):
+        return None # FIXME
+
     def calcSlices(self, design_type):
-        return {} #FIXME
+        return {}  # FIXME
 
     def calcWeightGate(self, slices):
-        return 0 #FIXME
+        return 0  # FIXME
 
     def calcWeightFilling(self, filling_type):
-        return 0 #FIXME
-
-
-
-    # def isValid(self, props):
-    #     """Проверяет данные на валидность"""
-    #     id, value = list(props.items())[0]
-    #     print('isValid props:', id, value)
-    #     res = self.validator.checkValue(id, value)
-    #     print('isValid result:', res)
-    #     if res:
-    #         self.emit('errors', res)
+        return 0  # FIXME
 
 
 class DesignModelMap():
-
     def __init__(self, map_file):
         self.map_file = map_file
 

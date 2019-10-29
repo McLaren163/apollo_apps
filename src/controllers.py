@@ -1,29 +1,24 @@
 class Controller():
 
-    def __init__(self, view, model, start_state=None):
+    def __init__(self, view, model):
         self.view = view
         self.model = model
         self.subscribeOnEvents()
 
-    def subscribeOnEvents(self):
-        self.view.on('submit', self.submitHandler)
-        self.view.on('new value', self.newValuesHandler)
+    def start(self, start_state=None):
+        self.view.run(state=start_state)
 
-        self.model.on('new state', self.syncViewHandler)
+    def subscribeOnEvents(self):
+        self.view.on('submit', self.viewSubmitHandler)
+
         self.model.on('errors', self.errorsHandler)
         self.model.on('return data', self.returnDataHandler)
 
-    def submitHandler(self):
-        self.model.startCalculate()
-
-    def newValuesHandler(self, args):
-        self.model.setState(args)
+    def viewSubmitHandler(self, values):
+        self.model.calculate(values)
 
     def errorsHandler(self, args):
-        pass
+        self.view.showErrors(errors)
 
-    def syncViewHandler(self, args):
-        self.view.setState(args)
-
-    def returnDataHandler(self, args):
-        self.view.showResult(args)
+    def returnDataHandler(self, data):
+        self.view.showResult(data)

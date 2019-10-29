@@ -1,2 +1,11 @@
+autopep8==1.4.3
+entrypoints==0.3
+flake8==3.7.7
 fpdf==1.7.2
+mccabe==0.6.1
+pep8==1.7.1
+pycodestyle==2.5.0
+pyflakes==2.1.1
 pymitter==0.2.3
+PySimpleGUI==3.27.0
+typing==3.6.6

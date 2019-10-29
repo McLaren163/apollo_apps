@@ -7,16 +7,19 @@ from tkinter.ttk import Combobox
 # from config import *
 
 # под вопросом нужен ли?
+
+
 class InputMixin():
     def getVariable(self):
         return {self.id: {
-                    'text': self.text,
-                    'var': self.var
-                }}
+            'text': self.text,
+            'var': self.var
+        }}
 
 
 class TextVar():
     """Объект переменной значения для виджета Text"""
+
     def __init__(self, text_widget):
         self.text = text_widget
 
@@ -55,7 +58,7 @@ class Input(InputMixin, tk.Frame):
         if not values:
             self.var = tk.StringVar()
             self.entry = tk.Entry(self, textvariable=self.var,
-                           justify=tk.CENTER, font=font)
+                                  justify=tk.CENTER, font=font)
             self.entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         # elif values == '>Date<':
         #     tk.Button(self, text='...', font=font).pack(
@@ -64,7 +67,7 @@ class Input(InputMixin, tk.Frame):
         #                    justify=tk.CENTER, font=font)
         #     entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
         elif values == '>Boolean<':
-            self.var = tk.BooleanVar()
+            self.var = tk.IntVar()
             self.entry = tk.Checkbutton(self, variable=self.var,
                                         onvalue=1, offvalue=0)
             self.entry.pack(expand=tk.YES)
@@ -74,8 +77,9 @@ class Input(InputMixin, tk.Frame):
             self.var = TextVar(self.entry)
         else:
             self.var = tk.StringVar()
-            self.entry = Combobox(self, textvariable=self.var, justify=tk.CENTER,
-                              font=font, values=values, state='readonly')
+            self.entry = Combobox(self, textvariable=self.var,
+                                  justify=tk.CENTER,
+                                  font=font, values=values, state='readonly')
             # entry.current(0)
             self.entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
 
@@ -85,12 +89,17 @@ class Input(InputMixin, tk.Frame):
     def bindEventNewValue(self, callback):
         """привязывет функцию callback на изменение значения виджета"""
         self.callback = callback
-        self.entry.bind('<Return>',
-                        lambda e: callback(self.getValue()))
-        self.entry.bind('<FocusOut>',
-                        lambda e: callback(self.getValue()))
-        self.entry.bind('<<ComboboxSelected>>',
-                        lambda e: callback(self.getValue()))
+        if isinstance(self.entry, Combobox):
+            self.entry.bind('<<ComboboxSelected>>',
+                            lambda e: callback(self.getValue()))
+        elif isinstance(self.entry, tk.Checkbutton):
+            self.entry.bind('<ButtonRelease-1>',
+                            lambda e: callback(self.getValue()))
+        else:
+            self.entry.bind('<Return>',
+                            lambda e: callback(self.getValue()))
+            self.entry.bind('<FocusOut>',
+                            lambda e: callback(self.getValue()))
 
     def getValue(self):
         return self.var.get()
@@ -99,7 +108,6 @@ class Input(InputMixin, tk.Frame):
         self.var.set(new_value)
         if check and self.callback:
             self.callback(new_value)
-
 
 
 class InputsBlock(tk.LabelFrame):
@@ -112,6 +120,7 @@ class InputsBlock(tk.LabelFrame):
                                           'значение2',
                                           'значение3'))),
     """
+
     def __init__(self, parent, name, columns, input_name_width, input_font,
                  block_font, props):
         super().__init__(parent, text=name, font=block_font)
@@ -149,6 +158,7 @@ class InputsBlockFrame(tk.LabelFrame):
                                           'значение2',
                                           'значение3'))),
     """
+
     def __init__(self, parent, name, columns, label_width, font, font_block):
         super().__init__(parent, text=name, font=font_block)
         self.label_width = label_width
@@ -193,7 +203,8 @@ class PreviewWin(tk.Toplevel):
         preview = image.resize((600, 800), Image.ADAPTIVE)
         self.thumbs = PhotoImage(preview)
         self._makeWidgets()
-        self.configure(width=600, height=600)  # TODO установить размер окна по дефолту
+        # TODO установить размер окна по дефолту
+        self.configure(width=600, height=600)
         self.grab_set()
         self.focus_set()
         self.wait_window()
