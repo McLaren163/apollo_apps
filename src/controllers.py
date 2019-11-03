@@ -17,7 +17,7 @@ class Controller():
     def viewSubmitHandler(self, values):
         self.model.calculate(values)
 
-    def errorsHandler(self, args):
+    def errorsHandler(self, errors):
         self.view.showErrors(errors)
 
     def returnDataHandler(self, data):

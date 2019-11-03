@@ -133,7 +133,7 @@ class ShiftGateView(EventEmitter):
         create pdf object and save to file
         """
         font = self.cfg['fonts']['pdf']
-        pdf = PDFShiftgate(data, font)
+        pdf = PDFShiftgate(data, font=font)
         pdf.save(file_name)
 
     def _choose_filename(self, data):

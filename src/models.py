@@ -1,11 +1,17 @@
 from pymitter import EventEmitter
 import csv
 
+SMALL_CONSOLE_ERR = 'Размер консоли меньше 1//3 ширины проема'
+NOT_DRAFT_ERR = 'Нет подходящего типа чертежа'
+
 
 class ShiftGateModel(EventEmitter):
     def __init__(self, design_map):
         super().__init__()
+        # create empty state
         self.state = {}
+        # create empty errors list
+        self.errors = []
         # self.change_state = True
         self.design_map = design_map
 
@@ -20,23 +26,47 @@ class ShiftGateModel(EventEmitter):
         self.state.clear()
         # update model state with external data
         self.state.update(data)
-        # add empty error and attention lists to the model state
-        self.state['errors'] = []
+        # add empty attention lists to the model state
         self.state['attentions'] = []
         # add draft type to the model state
-        self.addDraftTypeToState(data)
+        self._addDraftTypeToState(self.state)
+        self._calcFullWidth(self.state)
+        self._calcWorkWidth(self.state)
+        self._calcConsoleWidth(self.state)
 
         # send event with new data
-        self.emit('return data', self.state.copy())
+        self.emit('return data', self.state)
 
-    def addDraftTypeToState(self, data):
-        draft_type = self.getDraftType(data)
+    def _calcConsoleWidth(self, state):
+        full_width = int(state.get('full_width'))
+        work_width = int(state.get('work_width'))
+        console_width = full_width - work_width
+        state['console_width'] = console_width
+
+    def _calcWorkWidth(self, state):
+        work_width = int(state.get('width')) + 300
+        state['work_width'] = work_width
+
+    def _calcFullWidth(self, state):
+        full_width = int(state.get('full_width', 0))
+        width = int(state.get('width'))
+        width_min = int(width * 1.3)
+        width_max = int(width * 1.5)
+
+        if full_width < width_min:
+            self.errors.append(SMALL_CONSOLE_ERR)
+            self.emit('errors', self.errors)
+        if full_width >= width_max:
+            full_width = width_max
+
+        state['full_width'] = full_width
+
+    def _addDraftTypeToState(self, state):
+        draft_type = self.getDraftType(state)
         if draft_type:
-            self.state['draft_type'] = draft_type
+            state['draft_type'] = draft_type
         else:
-            self.state['errors'].append(
-                'ОШИБКА: Нет подходящего чертежа.'
-            )
+            self.errors.append(NOT_DRAFT_ERR)
 
     def getFType(self, values):
         return None  # FIXME

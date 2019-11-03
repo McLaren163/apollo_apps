@@ -18,9 +18,9 @@
       "bold"
     ],
     "pdf": {
-      "name": "Calibri",
-      "file": "./res/fonts/calibri.ttf",
-      "size": 14.0
+      "name": "IBMPlexMono-Regular",
+      "file": "./res/fonts/IBMPlexMono-Regular.ttf",
+      "size": 10.0
     }
   },
   "files": {

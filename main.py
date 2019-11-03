@@ -11,7 +11,9 @@ debugState = {'order': 'Order',
               'engineer': 'Engineer',
               'width': '4000',
               'height': '2000',
-              'cliarance': '100'}
+              'cliarance': '100',
+              'console': 'Треугольная',
+              'side': 'Вправо'}
 
 
 def main():
