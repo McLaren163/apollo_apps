@@ -24,16 +24,18 @@ class PDFShiftgate(FPDF):
     block_compl_x = left_margin
     block_compl_y = block_main_y + textline_h * 7 # 6+1 rows in main block
 
+    block_attention_x = left_margin
+    block_attention_y = block_compl_y + textline_h * 8 # 7+1 rows in compl block
+
     block_beamname_x = left_margin
-    block_beamname_y = 130
-    block_beamname_w = 60
+    block_beamname_y = block_attention_y + textline_h * 2
 
     block_beam_x = block_beamname_x
     block_beam_y = block_beamname_y + textline_h
-    block_beam_w = block_beamname_w
+    block_beam_h = 40
 
-    block_text_x = block_beam_x + block_beam_w + 5
-    block_text_y = block_beamname_y
+    block_comments_x = block_beam_x
+    block_comments_y = block_beam_y + block_beam_h + textline_h
 
     def __init__(self, data, model=None, font=None):
         super().__init__()
@@ -103,6 +105,9 @@ class PDFShiftgate(FPDF):
         self._renderMainParameters(self.data)
         self._renderComplectation(self.data)
         # self._renderCut()
+        attentions = self.data.get('attentions')
+        if attentions:
+            self._renderAttentions(attentions)
         # self._renderBeamName(self.data.get('beam'), self.data.get('beam_l'))
         # self._renderBeam(self.data.get('beam'))
         # self._renderComments(self.data.get('comments'))
@@ -171,4 +176,11 @@ class PDFShiftgate(FPDF):
 Зубчатая рейка: {rack} шт
 Задвижка DH: {lock}"""
         self.multi_cell(0, self.textline_h, txt.format(**values), align='L')
+
+    def _renderAttentions(self, attentions):
+        self.set_xy(self.block_attention_x, self.block_attention_y)
+        self.set_text_color(210, 0, 0) # red text color
+        txt = 'ВНИМАНИЕ: ' + str(attentions[0])  # FIXME only first value to print
+        self.cell(0, self.textline_h, txt)
+        self.set_text_color(0, 0, 0) # black text color
 

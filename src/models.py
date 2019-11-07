@@ -28,6 +28,7 @@ class ShiftGateModel(EventEmitter):
         self.state.update(data)
         # add empty attention lists to the model state
         self.state['attentions'] = []
+        self.state['attentions'].append('This text for test attentions!!!')
         # add draft type to the model state
         self._addDraftTypeToState(self.state)
         self._calcFullWidth(self.state)
