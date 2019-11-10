@@ -1,4 +1,4 @@
-from src.config import shiftgate_view_config
+from src.config import shiftgate_view_config as view_config
 from src.config import TYPE_MAP_FILE
 from src.models import ShiftGateModel, DesignModelMap
 from src.views import ShiftGateView
@@ -18,7 +18,7 @@ debugState = {'order': 'Order',
 
 def main():
     model = ShiftGateModel(DesignModelMap(TYPE_MAP_FILE))
-    view = ShiftGateView(shiftgate_view_config)
+    view = ShiftGateView(view_config)
     controller = Controller(view, model)
     controller.start(start_state=debugState)
 
