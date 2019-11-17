@@ -1,5 +1,3 @@
-import os
-
 GATE_IMAGES = {
     'draft_files': {
         'ATL': 'atl.png',
@@ -24,4 +22,3 @@ GATE_IMAGES = {
         "Нестандарт": 'xxx.png'
     }
 }
-

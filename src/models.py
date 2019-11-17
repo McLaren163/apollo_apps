@@ -22,10 +22,9 @@ class ShiftGateModel(EventEmitter):
     #     self.emit('new state', self.state.copy())
 
     def calculate(self, data):
-        # clear model state
-        self.state.clear()
-        # update model state with external data
-        self.state.update(data)
+        self.state = data
+        # FIXME add model type in state
+        self.state['model'] = 'ПРЕСТИЖ | ПРЕМИУМ'
         # add empty attention lists to the model state
         self.state['attentions'] = []
         self.state['attentions'].append('This text for test attentions!!!')

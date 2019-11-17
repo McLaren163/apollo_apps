@@ -4,13 +4,19 @@ import os
 import subprocess
 import sys
 from pymitter import EventEmitter
-from src.pdf_creator import PDFShiftgate
 
 
 class ShiftGateView(EventEmitter):
     def __init__(self, config):
         super().__init__()
         self.cfg = config
+        pdf_creator = config.get('pdf_creator')
+        if pdf_creator == 'fpdf_creator':
+            from fpdf_creator import PDFShiftgate 
+            self._pdf_creator = PDFShiftgate
+        if pdf_creator == 'xhtml2pdf':
+            from xhtml2pdf_creator import XHtml2Pdf
+            self._pdf_creator = XHtml2Pdf
 
     def run(self, state=None):
         # create main window
@@ -109,21 +115,25 @@ class ShiftGateView(EventEmitter):
         """
         self.window.Fill(values)
 
+    def openResultFile(self, filename):
+        """ open pdf file """
+        if sys.platform == 'win32':
+            os.startfile(filename)
+        else:
+            subprocess.call(['xdg-open', filename])
+
     def showResult(self, data):
         """
         create and open pdf file from data
         """
         # get name for pdf file
-        pdf_name = self._choose_filename(data)
+        pdf_name = self._choose_filename(self._getInitialFilename(data))
         print('View.showResult:', pdf_name)
         # create pdf file
         if pdf_name:
             self._createPdfFile(data, pdf_name)
-            # open pdf file
-            if sys.platform == 'win32':
-                os.startfile(pdf_name)
-            else:
-                subprocess.call(['xdg-open', pdf_name])
+            # show created file
+            self.openResultFile(pdf_name)
 
     def showErrors(self, errors):
         print('Errors')
@@ -132,18 +142,19 @@ class ShiftGateView(EventEmitter):
         """
         create pdf object and save to file
         """
-        font = self.cfg['fonts']['pdf']
-        pdf = PDFShiftgate(data, font=font)
-        pdf.save(file_name)
+        self._pdf_creator(data).save(file_name)
 
-    def _choose_filename(self, data):
-        """
-        return file name
-        """
+    def _getInitialFilename(self, data):
         order = data.get('order', 'XXX')
         customer = data.get('customer', 'XXXXXXXX')
         initial_file = '{}-{}'.format(order,
                                       customer)
+        return initial_file
+
+    def _choose_filename(self, initialfile):
+        """
+        return file name
+        """
         ftypes = [('Document PDF', '*.pdf'), ]
         file_name = tk.filedialog.asksaveasfilename(filetypes=ftypes,
                                                     initialfile=initial_file,

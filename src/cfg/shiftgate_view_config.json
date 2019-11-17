@@ -7,6 +7,7 @@
   "size_input": [25, 1],
   "size_combo": [22, 1],
   "size_multiline": [45, 5],
+  "pdf_creator": "xhtml2pdf",
   "fonts": {
     "gui": [
       "Calibri",
@@ -16,12 +17,7 @@
       "Calibri",
       "8",
       "bold"
-    ],
-    "pdf": {
-      "name": "IBMPlexMono-Regular",
-      "file": "./res/fonts/IBMPlexMono-Regular.ttf",
-      "size": 10.0
-    }
+    ]
   },
   "files": {
     "icon": ".\\res\\icons\\logo.ico"
