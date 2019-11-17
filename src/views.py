@@ -11,7 +11,7 @@ class ShiftGateView(EventEmitter):
         super().__init__()
         self.cfg = config
         pdf_creator = config.get('pdf_creator')
-        if pdf_creator == 'fpdf_creator':
+        if pdf_creator == 'fpdf':
             from fpdf_creator import PDFShiftgate 
             self._pdf_creator = PDFShiftgate
         if pdf_creator == 'xhtml2pdf':

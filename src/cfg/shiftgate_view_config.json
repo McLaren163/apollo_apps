@@ -7,7 +7,7 @@
   "size_input": [25, 1],
   "size_combo": [22, 1],
   "size_multiline": [45, 5],
-  "pdf_creator": "xhtml2pdf",
+  "pdf_creator": "fpdf",
   "fonts": {
     "gui": [
       "Calibri",
