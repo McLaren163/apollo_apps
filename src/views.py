@@ -12,11 +12,11 @@ class ShiftGateView(EventEmitter):
         self.cfg = config
         pdf_creator = config.get('pdf_creator')
         if pdf_creator == 'fpdf':
-            from fpdf_creator import PDFShiftgate 
+            from src.fpdf_creator import PDFShiftgate 
             self._pdf_creator = PDFShiftgate
         if pdf_creator == 'xhtml2pdf':
-            from xhtml2pdf_creator import XHtml2Pdf
-            self._pdf_creator = XHtml2Pdf
+            from src.html2pdf_creator import xhtml2pdf
+            self._pdf_creator = xhtml2pdf
 
     def run(self, state=None):
         # create main window
@@ -157,7 +157,7 @@ class ShiftGateView(EventEmitter):
         """
         ftypes = [('Document PDF', '*.pdf'), ]
         file_name = tk.filedialog.asksaveasfilename(filetypes=ftypes,
-                                                    initialfile=initial_file,
+                                                    initialfile=initialfile,
                                                     defaultextension='.pdf')
         return file_name
 

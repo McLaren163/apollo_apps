@@ -3,8 +3,8 @@ from fpdf import FPDF
 from src.cfg.graphics import GATE_IMAGES
 from .config import IMAGE_FOLDER
 
-FONT_NAME = "IBMPlexMono-Regular",
-FONT_FILE = "./res/fonts/IBMPlexMono-Regular.ttf",
+FONT_NAME = "IBMPlexMono-Regular"
+FONT_FILE = "./res/fonts/IBMPlexMono-Regular.ttf"
 FONT_SIZE = 10.0
 
 
@@ -47,7 +47,7 @@ class PDFShiftgate(FPDF):
             self.add_font(FONT_NAME, '', FONT_FILE, uni=True)
             self.set_font(FONT_NAME)
         except:
-            pass
+            print('EXEPTION: PDFShiftgate - Not set new font!')
 
         self.l_margin = self.left_margin
         self.r_margin = 5.0
@@ -97,8 +97,6 @@ class PDFShiftgate(FPDF):
         self.set_font_size(self.f_size - 2.0)
 
         # self.renderDraft(self.data.get('draft_type'))
-
-        # TODO render attention info
 
         self._renderMainParameters(self.data)
         self._renderComplectation(self.data)
@@ -177,8 +175,8 @@ class PDFShiftgate(FPDF):
 
     def _renderAttentions(self, attentions):
         self.set_xy(self.block_attention_x, self.block_attention_y)
-        self.set_text_color(210, 0, 0) # red text color
-        txt = 'ВНИМАНИЕ: ' + str(attentions[0])  # FIXME only first value to print
+        self.set_text_color(210, 0, 0)  # red text color
+        # FIXME only first value to print
+        txt = 'ВНИМАНИЕ: ' + str(attentions[0])
         self.cell(0, self.textline_h, txt)
-        self.set_text_color(0, 0, 0) # black text color
-
+        self.set_text_color(0, 0, 0)  # black text color
