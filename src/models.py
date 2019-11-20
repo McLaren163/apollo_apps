@@ -33,9 +33,16 @@ class ShiftGateModel(EventEmitter):
         self._calcFullWidth(self.state)
         self._calcWorkWidth(self.state)
         self._calcConsoleWidth(self.state)
+        self._calcBeamLenght(self.state)
 
         # send event with new data
         self.emit('return data', self.state)
+
+    def _calcBeamLenght(self, state):
+        full_width = int(state.get('full_width'))
+        width = int(state.get('width'))
+        state['beam_l'] = str(full_width - width)
+
 
     def _calcConsoleWidth(self, state):
         full_width = int(state.get('full_width'))

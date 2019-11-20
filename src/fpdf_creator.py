@@ -17,10 +17,10 @@ class PDFShiftgate(FPDF):
 
     block_draft_x = left_margin
     block_draft_y = 35
-    block_draft_h = 90
+    block_draft_h = 60
 
     block_main_x = left_margin
-    block_main_y = 80
+    block_main_y = block_draft_y + block_draft_h + textline_h
 
     block_compl_x = left_margin
     block_compl_y = block_main_y + textline_h * 7  # 6+1 rows in main block
@@ -37,6 +37,7 @@ class PDFShiftgate(FPDF):
 
     block_comments_x = block_beam_x
     block_comments_y = block_beam_y + block_beam_h + textline_h
+    block_comments_w = 85
 
     def __init__(self, data):
         super().__init__()
@@ -96,7 +97,7 @@ class PDFShiftgate(FPDF):
         self.add_page('P')
         self.set_font_size(self.f_size - 2.0)
 
-        # self.renderDraft(self.data.get('draft_type'))
+        self._renderDraft(self.data.get('draft_type'))
 
         self._renderMainParameters(self.data)
         self._renderComplectation(self.data)
@@ -104,9 +105,11 @@ class PDFShiftgate(FPDF):
         attentions = self.data.get('attentions')
         if attentions:
             self._renderAttentions(attentions)
-        # self._renderBeamName(self.data.get('beam'), self.data.get('beam_l'))
-        # self._renderBeam(self.data.get('beam'))
-        # self._renderComments(self.data.get('comments'))
+        beam_type = self.data.get('beam')
+        beam_length = self.data.get('beam_l')
+        self._renderBeamName(beam_type, beam_length)
+        self._renderBeam(self.data.get('beam'))
+        self._renderComments(self.data.get('comments'))
 
     def createTwoPage(self):
         pass
@@ -134,10 +137,13 @@ class PDFShiftgate(FPDF):
         pass
 
     def _renderComments(self, text):
-        self.set_x(self.block_text_x)
+        self.set_xy(self.block_comments_x, self.block_comments_y)
         # self.set_font('', 'B')
         self.cell(0, self.textline_h, 'ПРИМЕЧАНИЕ:', ln=2)
-        self.multi_cell(0, self.textline_h, text, align='L')
+        self.multi_cell(self.block_comments_w,
+                        self.textline_h,
+                        text,
+                        align='L')
         # self.set_font('', '')
 
     def _renderDraft(self, draft_type):
@@ -147,20 +153,20 @@ class PDFShiftgate(FPDF):
                          y=self.block_draft_y,
                          h=self.block_draft_h)
 
-    def _renderBeamName(self, beam_type, beam_length):
+    def _renderBeamName(self, beam_type, beam_length=0):
         txt = str(beam_type)
         if beam_length:
             txt = txt + ': ' + str(beam_length) + ' мм'
 
         self.set_xy(self.block_beamname_x, self.block_beamname_y)
-        self.cell(self.block_beamname_w, self.textline_h, txt)
+        self.cell(0, self.textline_h, txt)
 
     def _renderBeam(self, beam_type):
         image_name = GATE_IMAGES['beam_files'].get(beam_type)
         self.renderImage(image_name,
                          x=self.block_beam_x,
                          y=self.block_beam_y,
-                         w=self.block_beam_w)
+                         h=self.block_beam_h)
 
     def _renderComplectation(self, values):
         self.set_xy(self.block_compl_x, self.block_compl_y)
