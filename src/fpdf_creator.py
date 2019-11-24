@@ -1,11 +1,14 @@
 import os
 from fpdf import FPDF
-from src.cfg.graphics import GATE_IMAGES
-from .config import IMAGE_FOLDER
+from src import config as CFG
 
 FONT_NAME = "IBMPlexMono-Regular"
 FONT_FILE = "./res/fonts/IBMPlexMono-Regular.ttf"
 FONT_SIZE = 10.0
+
+LOGO_FILE = 'apollo_logo.png'
+GATE_IMAGES = CFG.GATE_IMAGES
+IMAGE_FOLDER = CFG.FOLDERS.get('img')
 
 
 class PDFShiftgate(FPDF):
@@ -61,7 +64,7 @@ class PDFShiftgate(FPDF):
 
         self.ln()
         # render logo
-        self.renderImage('apollo_logo.png',
+        self.renderImage(LOGO_FILE,
                          self.l_margin,
                          self.t_margin,
                          h=10)
@@ -147,7 +150,7 @@ class PDFShiftgate(FPDF):
         # self.set_font('', '')
 
     def _renderDraft(self, draft_type):
-        image_name = GATE_IMAGES['draft_files'].get(draft_type)
+        image_name = GATE_IMAGES['drafts'].get(draft_type)
         self.renderImage(image_name,
                          x=self.block_draft_x,
                          y=self.block_draft_y,
@@ -162,7 +165,7 @@ class PDFShiftgate(FPDF):
         self.cell(0, self.textline_h, txt)
 
     def _renderBeam(self, beam_type):
-        image_name = GATE_IMAGES['beam_files'].get(beam_type)
+        image_name = GATE_IMAGES['beams'].get(beam_type)
         self.renderImage(image_name,
                          x=self.block_beam_x,
                          y=self.block_beam_y,

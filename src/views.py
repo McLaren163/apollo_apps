@@ -4,27 +4,29 @@ import os
 import subprocess
 import sys
 from pymitter import EventEmitter
+from src import config as CFG
 
 
 class ShiftGateView(EventEmitter):
-    def __init__(self, config):
+    def __init__(self):
         super().__init__()
-        self.cfg = config
-        pdf_creator = config.get('pdf_creator')
+        pdf_creator = CFG.PDF.get('creator')
         if pdf_creator == 'fpdf':
             from src.fpdf_creator import PDFShiftgate 
             self._pdf_creator = PDFShiftgate
-        if pdf_creator == 'xhtml2pdf':
+        elif pdf_creator == 'xhtml2pdf':
             from src.html2pdf_creator import xhtml2pdf
             self._pdf_creator = xhtml2pdf
+        else:
+            pass  # FIXME raise exeption
 
     def run(self, state=None):
         # create main window
-        title = self.cfg['title']
-        icon = self.cfg['files']['icon']
-        font = self.cfg['fonts']['gui']
+        title = CFG.GUI.get('title')
+        icon = CFG.FILES.get('icon')
+        font = CFG.GUI.get('fonts').get('normal')
         button_color = ('black', 'darkgrey')
-        layout = self._createLayout(self.cfg)
+        layout = self._createLayout()
         self.window = sg.Window(title, icon=icon, font=font,
                                 element_padding=(0, 1),
                                 button_color=button_color).Layout(layout)
@@ -42,8 +44,8 @@ class ShiftGateView(EventEmitter):
 
         self.window.Close()
 
-    def _createLayout(self, layout_config):
-        insert = insertInputFabric(layout_config)
+    def _createLayout(self):
+        insert = insertInputFabric()
 
         order_c0 = [
             insert('order'),
@@ -162,18 +164,20 @@ class ShiftGateView(EventEmitter):
         return file_name
 
 
-def insertInputFabric(config):
+def insertInputFabric():
     def wrap(_id, submit=False):
-        return insertInput(_id, submit, config)
+        return insertInput(_id, submit)
     return wrap
 
 
-def insertInput(_id, submit, config):
-    s_txt = config['size_text']
-    s_inp = config['size_input']
-    s_cmb = config['size_combo']
-    s_mul = config['size_multiline']
-    element = config['inputs'][_id]
+def insertInput(_id, submit):
+    gui = CFG.GUI
+    widgets = CFG.WIDGETS
+    s_txt = gui['size_text']
+    s_inp = gui['size_input']
+    s_cmb = gui['size_combo']
+    s_mul = gui['size_multiline']
+    element = widgets[_id]
     res = []
 
     text = element.get('text')
