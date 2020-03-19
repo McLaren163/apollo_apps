@@ -1,3 +1,9 @@
+import os
+
+CWD = os.path.abspath(os.path.dirname(__file__))
+os.chdir(CWD)
+print('Change CWD to:', CWD)
+
 from src import config as CFG
 from src.models import ShiftGateModel, DesignModelMap
 from src.views import ShiftGateView
@@ -8,6 +14,7 @@ debugState = {'order': 'Order',
               'customer': 'Customer',
               'date': 'Date',
               'engineer': 'Engineer',
+              'model': 'Престиж',
               'width': '4000',
               'full_width': '6000',
               'height': '2000',

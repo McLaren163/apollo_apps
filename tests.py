@@ -1,7 +1,7 @@
 import os
+import sys
 import json
 import tkinter as tk
-from src.widgets import Input, InputsBlock
 
 
 def test_json():
@@ -10,24 +10,6 @@ def test_json():
         conf = json.load(file)
     print(conf['files']['icon'])
     print(conf['fonts']['gui'])
-
-
-def test_inputs():
-    root = tk.Tk()
-    w = Input(root, 'Label', width=17)
-    w.pack(fill=tk.X)
-    w = Input(root, 'Label', width=17)
-    w.pack(fill=tk.X)
-    bl = InputsBlock(root,
-                     17,
-                     None,
-                     None,
-                     {'name': 'Block',
-                      'columns': 2,
-                      'inputs': (('Inp1', None),
-                                 ('Inp2', None))})
-    bl.pack()
-    root.mainloop()
 
 
 def test_model_map():
@@ -54,10 +36,37 @@ def test_events():
     tk.Entry(root).pack()
     root.mainloop()
 
+def test_cwd():
+    print(os.getcwd())
+    print(sys.argv[0])
+
+    CWD = os.path.abspath(os.path.dirname(__file__))
+    os.chdir(CWD)
+    print(os.getcwd())
+
+def test_sketches():
+    sketches = (
+        {'a': [2,],
+        'b': [3,],
+        'filename': 'name1'},
+        {'a': [4,],
+        'b': [5,],
+        'filename': 'name2'}
+    )
+    filter_ = {
+        'a': 2,
+        'b': 5
+    }
+    path = 'dir'
+    from src.sketches import Sketches
+    sk = Sketches(sketches, path)
+    p = sk.get_filepath(filter_)
+    print(p)
 
 if __name__ == "__main__":
     # test_json()
     # test_inputs()
     # test_model_map()
     # test_events()
-    print(os.path.abspath(os.path.dirname(__file__)))
+    # test_cwd()
+    test_sketches()

@@ -1,7 +1,11 @@
+.gitignore
 venv/
 src/__pycache__/
 __pycache__/
+.ropeproject/
+.vscode/
 apollo_apps.sublime-project
 apollo_apps.sublime-workspace
-sublime*
+apollo_apps.code-workspace
 *.pyc
+*.pdf

@@ -14,9 +14,6 @@ class ShiftGateView(EventEmitter):
         if pdf_creator == 'fpdf':
             from src.fpdf_creator import PDFShiftgate 
             self._pdf_creator = PDFShiftgate
-        elif pdf_creator == 'xhtml2pdf':
-            from src.html2pdf_creator import xhtml2pdf
-            self._pdf_creator = xhtml2pdf
         else:
             pass  # FIXME raise exeption
 
@@ -25,14 +22,16 @@ class ShiftGateView(EventEmitter):
         title = CFG.GUI.get('title')
         icon = CFG.FILES.get('icon')
         font = CFG.GUI.get('fonts').get('normal')
-        button_color = ('black', 'darkgrey')
-        layout = self._createLayout()
-        self.window = sg.Window(title, icon=icon, font=font,
-                                element_padding=(0, 1),
-                                button_color=button_color).Layout(layout)
+        sg.SetOptions(button_color=('black','lightgray'),
+                      font=font,
+                      margins=(2,1))
+        layout = self._create_layout()
+        self.window = sg.Window(title,
+                                icon=icon,
+                                element_padding=(0, 1)).Layout(layout)
 
         if state:
-            self.setState(state)
+            self.set_state(state)
 
         # run main event loop
         while True:
@@ -40,52 +39,59 @@ class ShiftGateView(EventEmitter):
             if event is None:
                 break   # exit
             elif event == 'submit_key':
-                self.emit('submit', values)
+                filename = self.get_filename(self._get_initial_filename(values))
+                print(filename)
+                if filename:
+                    values['filepath'] = filename
+                    self.emit('submit', values)
 
         self.window.Close()
 
-    def _createLayout(self):
-        insert = insertInputFabric()
-
+    def _create_layout(self):
         order_c0 = [
-            insert('order'),
-            insert('customer')
+            get_form('order'),
+            get_form('customer')
         ]
         order_c1 = [
-            insert('engineer'),
-            insert('date')
+            get_form('date'),
+            get_form('engineer')
         ]
         gate_c0 = [
-            insert('width'),
-            insert('full_width'),
-            insert('console', True),
-            insert('frame'),
-            insert('filling'),
-            insert('filling_weight'),
+            get_form('model'),
+            get_form('width'),
+            get_form('height'),
+            get_form('cliarance'),
+            get_form('full_width'),
+            get_form('side'),
+            get_form('console'),
         ]
         gate_c1 = [
-            insert('height'),
-            insert('cliarance'),
-            insert('side'),
-            insert('kit'),
-            insert('frame_color'),
-            insert('filling_color'),
-            insert('color_type'),
+            get_form('kit'),
+            get_form('frame'),
+            get_form('frame_color'),
+            get_form('filling'),
+            get_form('filling_color'),
+            get_form('color_type'),
         ]
-        extra_c0 = [
-            insert('reception_column'),
-            insert('reception_column_height'),
-            insert('reception_column_num'),
-            insert('beam'),
-            insert('rack'),
+        complectation_c0 = [
+            get_form('rack'),
+            get_form('beam'),
+            get_form('adjustments'),
         ]
-        extra_c1 = [
-            insert('console_column'),
-            insert('console_column_height'),
-            insert('console_column_num'),
-            insert('lock'),
-            insert('door'),
-            insert('decor'),
+        complectation_c1 = [
+            get_form('lock'),
+            get_form('door'),
+            get_form('decor'),
+        ]
+        columns_c0 = [
+            get_form('reception_column'),
+            get_form('reception_column_height'),
+            get_form('reception_column_num'),
+        ]
+        columns_c1 = [
+            get_form('console_column'),
+            get_form('console_column_height'),
+            get_form('console_column_num'),
         ]
         order_layout = [
             [sg.Column(order_c0), sg.Column(order_c1)],
@@ -93,84 +99,78 @@ class ShiftGateView(EventEmitter):
         gate_layout = [
             [sg.Column(gate_c0), sg.Column(gate_c1)],
         ]
-        extra_layout = [
-            [sg.Column(extra_c0), sg.Column(extra_c1)],
+        complectation_layout = [
+            [sg.Column(complectation_c0), sg.Column(complectation_c1)]
+        ]
+        column_layout = [
+            [sg.Column(columns_c0), sg.Column(columns_c1)],
         ]
         comment_layout = [
-            insert('comments'),
-            # [sg.Multiline(size=self.cfg.get('size_multiline'))],
+            get_form('comments'),
         ]
 
         # main layout
         layout = [
-            [sg.Frame('Информация о заказе', order_layout)],
+            [sg.Frame('Информация о заказе', order_layout, pad=(0,0))],
             [sg.Frame('Параметры ворот', gate_layout)],
-            [sg.Frame('Комплектация', extra_layout)],
+            [sg.Frame('Комплектация', complectation_layout)],
+            [sg.Frame('Столбы', column_layout)],
             [sg.Frame('Комментарий', comment_layout)],
             [sg.Button('Чертёж', key='submit_key')],
         ]
+
         return layout
 
-    def setState(self, values):
+    def set_state(self, values):
         """
         set all new values to view
         """
         self.window.Fill(values)
 
-    def openResultFile(self, filename):
+    def open_result_file(self, filename):
         """ open pdf file """
         if sys.platform == 'win32':
             os.startfile(filename)
         else:
             subprocess.call(['xdg-open', filename])
 
-    def showResult(self, data):
+    def show_result(self, filename):
         """
-        create and open pdf file from data
+        pdf file from data
         """
-        # get name for pdf file
-        pdf_name = self._choose_filename(self._getInitialFilename(data))
-        print('View.showResult:', pdf_name)
-        # create pdf file
-        if pdf_name:
-            self._createPdfFile(data, pdf_name)
-            # show created file
-            self.openResultFile(pdf_name)
+        if os.path.isfile(filename):
+            self.open_result_file(filename)
+        else:
+            message = 'Файл {} не найден!'.format(filename)
+            self.show_errors(message)
 
-    def showErrors(self, errors):
-        print('Errors')
+    def show_errors(self, *errors):
+        print(errors)
+        sg.PopupError(*errors, title='Ошибка')
 
-    def _createPdfFile(self, data, file_name):
-        """
-        create pdf object and save to file
-        """
-        self._pdf_creator(data).save(file_name)
-
-    def _getInitialFilename(self, data):
+    def _get_initial_filename(self, data):
         order = data.get('order', 'XXX')
         customer = data.get('customer', 'XXXXXXXX')
-        initial_file = '{}-{}'.format(order,
+        initial_filename = '{}-{}.pdf'.format(order,
                                       customer)
-        return initial_file
+        return initial_filename
 
-    def _choose_filename(self, initialfile):
+    def get_filename(self, initial_name):
         """
         return file name
         """
-        ftypes = [('Document PDF', '*.pdf'), ]
-        file_name = tk.filedialog.asksaveasfilename(filetypes=ftypes,
-                                                    initialfile=initialfile,
+        file_types = (('Document PDF', '*.pdf'), )
+
+        file_name = tk.filedialog.asksaveasfilename(title='Select file to save',
+                                                    filetypes=file_types,
+                                                    initialdir=CFG.HOMEDIR,
+                                                    initialfile=initial_name,
                                                     defaultextension='.pdf')
+
         return file_name
 
 
-def insertInputFabric():
-    def wrap(_id, submit=False):
-        return insertInput(_id, submit)
-    return wrap
-
-
-def insertInput(_id, submit):
+def get_form(_id, submit=False):
     gui = CFG.GUI
     widgets = CFG.WIDGETS
     s_txt = gui['size_text']

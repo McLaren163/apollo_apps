@@ -1,8 +1,15 @@
 from pymitter import EventEmitter
 import csv
+import math
+from src import config as CFG
+from src.exeptions import ApolloError, NotIntError, SmallConsoleError, SketchNotFoundByConditionError
+from src.fpdf_creator import PDFShiftgate
+from src.utilities import FilterByDict, get_filepath
 
-SMALL_CONSOLE_ERR = 'Размер консоли меньше 1//3 ширины проема'
-NOT_DRAFT_ERR = 'Нет подходящего типа чертежа'
+SMALL_FULL_WIDTH_ATT = 'Размер консоли меньше 1//5 ширины проема!'
+SHORT_RACK_ATT = 'Недостаточное количество рубчатой рейки!'
+
+WORK_WIDTH_INCREMENT = 300
 
 
 class ShiftGateModel(EventEmitter):
@@ -15,154 +22,124 @@ class ShiftGateModel(EventEmitter):
         # self.change_state = True
         self.design_map = design_map
 
-    # def setState(self, props):
-    #     self.state.update(props)
-    #     # проверить новое значение и внести корректировки в существующие
-    #     self.change_state = True
-    #     self.emit('new state', self.state.copy())
-
-    def calculate(self, data):
+    def create_draft(self, data):
         self.state = data
-        # FIXME add model type in state
-        self.state['model'] = 'ПРЕСТИЖ | ПРЕМИУМ'
+        try:
+            self.calculate_data()
+            self.create_pdf_file(PDFShiftgate, data, data.get('filepath'))
+        except ApolloError as e:
+            self.emit('errors', *e.get_messages())
+        else:
+            # send event with new data
+            self.emit('ok', self.state.get('filepath'))
+
+    def create_pdf_file(self, pdf_creator, data, filepath):
+        pdf_creator(data).save(filepath)
+
+    def calculate_data(self, data=None):
+        if data:
+            self.state = data
         # add empty attention lists to the model state
         self.state['attentions'] = []
-        self.state['attentions'].append('This text for test attentions!!!')
-        # add draft type to the model state
-        self._addDraftTypeToState(self.state)
-        self._calcFullWidth(self.state)
-        self._calcWorkWidth(self.state)
-        self._calcConsoleWidth(self.state)
-        self._calcBeamLenght(self.state)
+        #  add test attention info
+        self._addAttention('This text for test attentions!!!')
 
-        # send event with new data
-        self.emit('return data', self.state)
+        self._validation_for_int()
+        self._calc_full_width()
+        self._calc_work_width()
+        self._calc_console_width()
+        self._calc_beam_length()
+        self._add_sketch_a()
+        self._add_sketch_b()
+        self._isAutomatic()
 
-    def _calcBeamLenght(self, state):
+    def _validation_for_int(self):
+        bad_params = []
+
+        to_validate = [key for key, value in CFG.WIDGETS.items()
+                       if value.get('int')]
+
+        for key in to_validate:
+            if not self.state.get(key).isdigit():
+                text = CFG.WIDGETS.get(key).get('text')
+                bad_params.append(text)
+
+        if bad_params:
+            raise NotIntError(*bad_params)
+
+    def _addAttention(self, text):
+        self.state['attentions'].append(text)
+
+    def _isAutomatic(self):
+        state = self.state
+        rack = state.get('rack')
+        if not rack.isdigit():
+            state['is_automatic'] = False
+            return
+        state['is_automatic'] = True
+        rack = int(rack)
+        min_rack = math.ceil((int(state.get('width')) + 500) / 1000)
+        if rack < min_rack:
+            self._addAttention(SHORT_RACK_ATT)
+
+    def _calc_beam_length(self):
+        state = self.state
         full_width = int(state.get('full_width'))
         width = int(state.get('width'))
-        state['beam_l'] = str(full_width - width)
+        state['beam_l'] = str(full_width - width - WORK_WIDTH_INCREMENT//2)
 
-
-    def _calcConsoleWidth(self, state):
+    def _calc_console_width(self):
+        state = self.state
         full_width = int(state.get('full_width'))
         work_width = int(state.get('work_width'))
         console_width = full_width - work_width
         state['console_width'] = console_width
 
-    def _calcWorkWidth(self, state):
-        work_width = int(state.get('width')) + 300
-        state['work_width'] = work_width
+    def _calc_work_width(self):
+        state = self.state
+        work_width = int(state.get('width')) + WORK_WIDTH_INCREMENT
+        state['work_width'] = str(work_width)
 
-    def _calcFullWidth(self, state):
-        full_width = int(state.get('full_width', 0))
+    def _calc_full_width(self):
+        state = self.state
+        full_width = int(state.get('full_width'))
         width = int(state.get('width'))
-        width_min = int(width * 1.3)
-        width_max = int(width * 1.5)
+        full_width_min = int(width * 1.3)
+        full_width_max = int(width * 1.5)
 
-        if full_width < width_min:
-            self.errors.append(SMALL_CONSOLE_ERR)
-            self.emit('errors', self.errors)
-        if full_width >= width_max:
-            full_width = width_max
-
-        state['full_width'] = full_width
-
-    def _addDraftTypeToState(self, state):
-        draft_type = self.getDraftType(state)
-        if draft_type:
-            state['draft_type'] = draft_type
+        if full_width < full_width_min:
+            raise SmallConsoleError(full_width)
+        elif full_width >= full_width_max:
+            state['full_width'] = str(full_width_max)
         else:
-            self.errors.append(NOT_DRAFT_ERR)
+            self._addAttention(SMALL_FULL_WIDTH_ATT)
 
-    def getFType(self, values):
-        return None  # FIXME
-
-    def getDraftType(self, data):
-        frame = self.getFrameType(data['width'], data['height'])
-        console = self.getConsoleType(data['console'])
-        direction = self.getDirectionType(data['side'])
-        return (frame + console + direction).upper()
-
-    def getDirectionType(self, direction):
-        if direction == 'Влево':
-            return 'L'
-        elif direction == 'Вправо':
-            return 'R'
+    def _add_sketch_a(self):
+        # FIXME 
+        filter_ = {}
+        filter_['model'] = self.state.get('model')
+        filter_['side'] = self.state.get('side')
+        filter_['console'] = self.state.get('console')
+        filter_['size'] = self._get_size_type(
+            self.state.get('model'),
+            self.state.get('width'),
+            self.state.get('height')
+        )
+        sketches = FilterByDict(CFG.SKETCHES_A)
+        count_of_results = sketches.apply_filter(filter_)
+        if count_of_results:
+            result = sketches.get_next()
+            path = get_filepath(CFG.FOLDERS.get('sketches_a'),
+                                result.get('filename'))
+            self.state['sketch_a_path'] = path 
         else:
-            return '_'
+            raise SketchNotFoundByConditionError('A')
 
-    def getConsoleType(self, console):
-        if console == 'Треугольная':
-            return 'T'
-        elif console == 'Прямоугольная':
-            return 'P'
-        else:
-            return None
+    def _add_sketch_b(self):
+        pass
 
-    def getFrameType(self, width, height):
-        """
-        вернет тип конструктива рамы,
-        если не найдет, то вернет None
-        """
-        return self.design_map.getType(int(width),
-                                       int(height))
-
-    def calcFullData(self, values):
-        """
-        вернет полные данные о модели для представления
-        data: {
-            sideType: str # тип чертежа 'АЛ' (А-тип Л-сторона)
-            frontType: str # тип чертежа 'A'
-            slices: dict # нарезка металла
-            ... # значения параметров
-            attention: list # список предупреждений
-        }
-        """
-        new_data = {}
-        attentions = []
-
-        # тип чертежа вид содвора
-        s_type = self.getSType(values)
-        if s_type:
-            new_data['s_type'] = s_type
-
-        # тип чертежа вид сбоку
-        f_type = self.getFType(values)
-        if f_type:
-            new_data['f_type'] = f_type
-
-        # нарезка металла
-        slices = self.calcSlices(s_type)  # dict {тип трубы: длина куска}
-
-        # основные размеры чертежа
-        main_sizes = self.getMainSizes(values)
-        new_data['main_sizes'] = main_sizes
-
-        # вес составляющих ворот
-        weight_gate = self.calcWeightGate(slices)
-        weight_filling = self.calcWeightFilling(self.state.get('filling'))
-        weight_bus = self.calcWeightBus()
-        weight_without_bus = weight_filling + weight_gate
-        new_data['weight_without_bus'] = weight_without_bus
-        full_weight = weight_without_bus + weight_bus
-        new_data['full_weight'] = full_weight
-
-        new_data['attention'] = attentions
-        return new_data
-
-    def getMainSizes(self, values):
-        return None # FIXME
-
-    def calcSlices(self, design_type):
-        return {}  # FIXME
-
-    def calcWeightGate(self, slices):
-        return 0  # FIXME
-
-    def calcWeightFilling(self, filling_type):
-        return 0  # FIXME
-
+    def _get_size_type(self, model, width, height):
+        return 'a'
 
 class DesignModelMap():
     def __init__(self, map_file):

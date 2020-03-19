@@ -3,22 +3,22 @@ class Controller():
     def __init__(self, view, model):
         self.view = view
         self.model = model
-        self.subscribeOnEvents()
+        self._subscribe_on_events()
 
     def start(self, start_state=None):
         self.view.run(state=start_state)
 
-    def subscribeOnEvents(self):
-        self.view.on('submit', self.viewSubmitHandler)
+    def _subscribe_on_events(self):
+        self.view.on('submit', self.submit_handler)
 
-        self.model.on('errors', self.errorsHandler)
-        self.model.on('return data', self.returnDataHandler)
+        self.model.on('errors', self.errors_handler)
+        self.model.on('ok', self.show_result_handler)
 
-    def viewSubmitHandler(self, values):
-        self.model.calculate(values)
+    def submit_handler(self, data):
+        self.model.create_draft(data)
 
-    def errorsHandler(self, errors):
-        self.view.showErrors(errors)
+    def errors_handler(self, *errors):
+        self.view.show_errors(*errors)
 
-    def returnDataHandler(self, data):
-        self.view.showResult(data)
+    def show_result_handler(self, filepath):
+        self.view.show_result(filepath)

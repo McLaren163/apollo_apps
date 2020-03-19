@@ -1,41 +1,56 @@
 import os
 
-PWD = os.path.abspath(os.path.dirname(__file__))
 
-TYPE_MAP_FILE = os.path.join('src', 'cfg', 'shiftgate_type_map.csv')
+HOMEDIR = os.path.expanduser('~')
 
-
-def get_filepath(dir, filename):
-    return os.path.join(FOLDERS.get(dir), filename)
-
+CWD = os.getcwd()
+print('CWD from config:', CWD)
 
 FOLDERS = {
-    'ico': os.path.join('res', 'icons'),
-    'img': os.path.join('res', 'img'),
-    'cfg': os.path.join('src', 'cfg')
+    'icons': os.path.join(CWD, 'res', 'icons'),
+    'images': os.path.join(CWD, 'res', 'images'),
+    'fonts': os.path.join(CWD, 'res', 'fonts'),
+    'configs': os.path.join(CWD, 'res', 'configs'),
+    'sketches_a': os.path.join(CWD, 'res', 'images', 'sketches_a'),
+    'sketches_b': os.path.join(CWD, 'res', 'images', 'sketches_b'),
 }
 
 FILES = {
-    'icon': get_filepath('ico', 'logo.ico'),
-    'gate_map': get_filepath('cfg', 'shiftgate_type_map.csv'),
+    'icon': os.path.join(CWD, 'res', 'icons', 'logo.ico'),
+    'logo': os.path.join(CWD, 'res', 'images', 'logos', 'apollo_logo.png'),
+    'font-stsev': os.path.join(CWD, 'res', 'fonts', 'STSEV851-78.ttf'),
 }
+
+RIGHT = 'Вправо' 
+LEFT = 'Влево'
+
+NO = 'НЕТ'
+YES = 'ДА'
+
+TRIANGLE = 'Треугольная'
+RECTANGLE = 'Прямоугольная'
+
+LIGHT = 'Лайт'
+PRESTIGE = 'Престиж'
+PREMIUM = 'Премиум'
+DEALER = 'Дилер'
 
 GUI = {
     'title': 'Откатные ворота "АПОЛЛО"',
     'win_width': 600,
     'win_height': 600,
-    'size_text': [18, 1],
-    'size_input': [25, 1],
-    'size_combo': [22, 1],
+    'size_text': [20, 1],
+    'size_input': [30, 1],
+    'size_combo': [27, 1],
     'size_multiline': [45, 5],
     'fonts': {
         'normal': [
             'Calibri',
-            '8'
+            '10'
         ],
         'bold': [
             'Calibri',
-            '8',
+            '10',
             'bold'
         ]
     }
@@ -45,38 +60,27 @@ PDF = {
     'creator': 'fpdf'
 }
 
-GATE_IMAGES = {
-    'drafts': {
-        'ATL': 'atl.png',
-        'APL': '',
-        'ATR': 'atr.png',
-        'APL': '',
-        'BPL': '',
-        'BPL': '',
-        'CPL': '',
-        'CPL': '',
-        'DPL': '',
-        'DPL': '',
-        'EPL': '',
-        'EPL': '',
-        'FPL': '',
-        'FPL': '',
+SKETCHES_A = (
+    {
+        'model': [PRESTIGE, PREMIUM],
+        'size': ['a',],
+        'side': [LEFT,],
+        'console': [TRIANGLE,],
+        'filename': 'patl.png'
     },
-    'beams': {
-        "Без опорной балки": 'xxx.png',
-        "Опорная балка": 'xxx.png',
-        "Продольная закладная": 'xxx.png',
-        "Нестандарт": 'xxx.png'
-    }
-}
+    {
+        'model': [PRESTIGE, PREMIUM],
+        'size': ['a',],
+        'side': [RIGHT,],
+        'console': [TRIANGLE,],
+        'filename': 'patr.png'
+    },
+)
 
-NO = 'НЕТ'
-
-YES = 'ДА'
 
 CONSOLE_TYPES = (
-    'Треугольная',
-    'Прямоугольная'
+    TRIANGLE,
+    RECTANGLE
 )
 
 KIT_TYPES = {
@@ -132,7 +136,11 @@ COLOR_TYPES = (
     'Глянец'
 )
 
-BEAM_TYPES = tuple(GATE_IMAGES['beams'])
+BEAM_TYPES = (
+    'Без опорной балки',
+    'Опорная балка',
+    'Продольная закладная'
+)
 
 COLUMN_TYPES = (
     'Стандартный',
@@ -140,8 +148,16 @@ COLUMN_TYPES = (
 )
 
 SIDE_TYPES = (
-    'Вправо',
-    'Влево'
+    RIGHT,
+    LEFT
+)
+
+
+GATE_MODELS = (
+    LIGHT,
+    PRESTIGE,
+    PREMIUM,
+    DEALER
 )
 
 WIDGETS = {
@@ -161,21 +177,29 @@ WIDGETS = {
         'text': 'Дата монтажа',
         'values': None
     },
+    'model': {
+        'text': 'Модель ворот',
+        'values': GATE_MODELS
+    },
     'width': {
         'text': 'Ширина проема, мм',
-        'values': None
+        'values': None,
+        'int': True,
     },
     'full_width': {
-        'text': 'Ширина полотна, мм',
-        'values': None
+        'text': 'Место для отката, мм',
+        'values': None,
+        'int': True,
     },
     'cliarance': {
         'text': 'Просвет, мм',
-        'values': None
+        'values': None,
+        'int': True,
     },
     'height': {
         'text': 'Высота полотна, мм',
-        'values': None
+        'values': None,
+        'int': True,
     },
     'side': {
         'text': 'Вид со двора',
@@ -248,17 +272,30 @@ WIDGETS = {
     'lock': {
         'text': 'Задвижка DH',
         'values': (
-            NO,
-            YES
+            YES,
+            NO
+        )
+    },
+    'adjustments': {
+        'text': 'Рег.площадки',
+        'values': (
+            YES,
+            NO
         )
     },
     'door': {
         'text': 'Встроенная калитка',
-        'values': '>Boolean<'
+        'values': (
+            YES,
+            NO
+        )
     },
     'decor': {
         'text': 'Переменный щит',
-        'values': '>Boolean<'
+        'values': (
+            YES,
+            NO
+        )
     },
     'comments': {
         'values': '>Text<'
