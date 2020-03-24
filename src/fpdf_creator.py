@@ -4,12 +4,12 @@ from src import config as CFG
 from src.exeptions import FileNotExistError
 
 FONT_NAME = "STSEV"
-FONT_FILE = CFG.FILES.get('font-stsev') 
+FONT_FILE = CFG.FILES.get('font-stsev')
 FONT_SIZE = 14.0
 
 LOGO_FILE = CFG.FILES.get('logo')
 
-TXT_GATE = """Параметры проема:
+TMPL_GATE = """Параметры проема:
   Ширина проема: {width} мм
   Высота проема: {height} мм
   Просвет: {cliarance} мм
@@ -19,47 +19,48 @@ TXT_GATE = """Параметры проема:
   Высота полотна:  мм
   Рабочая часть: {work_width} мм
   Консольная часть: {console_width} мм
-  Откат (вид содвора): {side} 
+  Откат (вид содвора): {side}
+  Система: {kit}
+  Рама: {frame}
+  Цвет рамы: {frame_color}"""
 
-  Система: {kit} 
-  Рама: {frame} 
-  Цвет рамы: {frame_color} 
-  Заполнение: {filling} 
-  Цвет заполнения: {filling_color} 
-  Структура краски: {color_type}"""
+TMPL_FILL = """Заполнение:
+  Вид заполнения: {filling}
+  Размер заполнения: мм
+  Цвет заполнения: {filling_color}
+  Структура краски: {color_type}
+
+Комплектация:
+  Столб приемный: {reception_column} {reception_column_height}мм {reception_column_num}шт
+  Столб от бокового качения: {console_column} {console_column_height}мм {console_column_num}шт
+  Зубчатая рейка: {rack}шт
+  Опорная балка: {beam}
+  Подставки регулировочные: {adjustments}
+  Ручка:
+  Задвижка: {lock}"""
+
+TMPL_COMMENT = """Примечание:
+  {comments}"""
+
 
 class PDFShiftgate(FPDF):
     """ """
     left_margin = 20
     textline_h = 5
 
-    block_logo_x = 150 
-    block_logo_y = 7 
+    block_logo_x = 150
+    block_logo_y = 7
     block_logo_h = 10
 
     block_sketch_a_x = left_margin
     block_sketch_a_y = 32
     block_sketch_a_h = 86
 
-    block_gate_x = left_margin + 10
-    block_gate_y = block_sketch_a_y + block_sketch_a_h + textline_h
+    block_txt1_x = left_margin + 5
+    block_txt1_y = block_sketch_a_y + block_sketch_a_h  # + textline_h
 
-    block_compl_x = left_margin
-    block_compl_y = block_gate_y + textline_h * 7  # 6+1 rows in main block
-
-    block_attention_x = left_margin
-    block_attention_y = block_compl_y + textline_h * 8  # 7+1 rows in compl blc
-
-    block_beamname_x = left_margin
-    block_beamname_y = block_attention_y + textline_h * 2
-
-    block_beam_x = block_beamname_x
-    block_beam_y = block_beamname_y + textline_h
-    block_beam_h = 40
-
-    block_comments_x = block_beam_x
-    block_comments_y = block_beam_y + block_beam_h + textline_h
-    block_comments_w = 85
+    block_txt2_x = block_txt1_x + 60
+    block_txt2_y = block_txt1_y
 
     def __init__(self, data):
         super().__init__()
@@ -119,10 +120,20 @@ class PDFShiftgate(FPDF):
         self.add_page('P')
         self.set_font_size(self.f_size)
 
-        self._render_cketch_a(self.data.get('sketch_a_path'))
+        self._render_cketch(self.data.get('sketch_a_path'),
+                            self.block_sketch_a_x,
+                            self.block_sketch_a_y,
+                            self.block_sketch_a_h)
 
-        self._render_gate_text()
-        # self._renderComplectation(self.data)
+        self._render_txt_block(self.block_txt1_x,
+                               self.block_txt1_y,
+                               TMPL_GATE,
+                               self.data)
+
+        self._render_txt_block(self.block_txt2_x,
+                               self.block_txt2_y,
+                               TMPL_FILL,
+                               self.data)
         # self._renderCut()
         # attentions = self.data.get('attentions')
         # if attentions:
@@ -142,57 +153,20 @@ class PDFShiftgate(FPDF):
             else:
                 raise FileNotExistError(image_path)
 
-    def _render_gate_text(self):
-        self.set_xy(self.block_gate_x, self.block_gate_y)
+    def _render_txt_block(self, x, y, tmpl, data, h=None, align='L'):
+        if not h:
+            h = self.textline_h
+        self.set_xy(x, y)
         self.multi_cell(0,
-                        self.textline_h,
-                        TXT_GATE.format(**self.data),
-                        align='L')
+                        h,
+                        tmpl.format(**data),
+                        align=align)
 
     def _renderCut(self):
         pass
 
-    def _renderComments(self, text):
-        self.set_xy(self.block_comments_x, self.block_comments_y)
-        # self.set_font('', 'B')
-        self.cell(0, self.textline_h, 'ПРИМЕЧАНИЕ:', ln=2)
-        self.multi_cell(self.block_comments_w,
-                        self.textline_h,
-                        text,
-                        align='L')
-        # self.set_font('', '')
-
-    def _render_cketch_a(self, sketch_path):
-        self.renderImage(sketch_path,
-                         x=self.block_sketch_a_x,
-                         y=self.block_sketch_a_y,
-                         h=self.block_sketch_a_h)
-
-    def _renderBeamName(self, beam_type, beam_length=0):
-        txt = str(beam_type)
-        if beam_length:
-            txt = txt + ': ' + str(beam_length) + ' мм'
-
-        self.set_xy(self.block_beamname_x, self.block_beamname_y)
-        self.cell(0, self.textline_h, txt)
-
-    def _renderBeam(self, beam_type):
-        image_name = GATE_IMAGES['beams'].get(beam_type)
-        self.renderImage(image_name,
-                         x=self.block_beam_x,
-                         y=self.block_beam_y,
-                         h=self.block_beam_h)
-
-    def _renderComplectation(self, values):
-        self.set_xy(self.block_compl_x, self.block_compl_y)
-        txt = """Рама: {frame} Цвет {frame_color} {color_type}
-Заполнение: {filling} Цвет {filling_color}
-Комплектация: {kit}
-Столб приемный: {reception_column} {reception_column_height} мм {reception_column_num} шт
-Столб от бокового качения: {console_column} {console_column_height} мм {console_column_num} шт
-Зубчатая рейка: {rack} шт
-Задвижка DH: {lock}"""
-        self.multi_cell(0, self.textline_h, txt.format(**values), align='L')
+    def _render_cketch(self, path, x, y, h):
+        self.renderImage(path, x=x, y=y, h=h)
 
     def _renderAttentions(self, attentions):
         self.set_xy(self.block_attention_x, self.block_attention_y)

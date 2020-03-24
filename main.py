@@ -10,10 +10,10 @@ from src.views import ShiftGateView
 from src.controllers import Controller
 
 
-debugState = {'order': 'Order',
-              'customer': 'Customer',
-              'date': 'Date',
-              'engineer': 'Engineer',
+debugState = {'order': '321',
+              'customer': 'Иванов Иван Иванович',
+              'date': '02.04.2020',
+              'engineer': 'Макаров Алексей',
               'model': 'Престиж',
               'width': '4000',
               'full_width': '6000',

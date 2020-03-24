@@ -12,7 +12,7 @@ class ShiftGateView(EventEmitter):
         super().__init__()
         pdf_creator = CFG.PDF.get('creator')
         if pdf_creator == 'fpdf':
-            from src.fpdf_creator import PDFShiftgate 
+            from src.fpdf_creator import PDFShiftgate
             self._pdf_creator = PDFShiftgate
         else:
             pass  # FIXME raise exeption
@@ -22,9 +22,9 @@ class ShiftGateView(EventEmitter):
         title = CFG.GUI.get('title')
         icon = CFG.FILES.get('icon')
         font = CFG.GUI.get('fonts').get('normal')
-        sg.SetOptions(button_color=('black','lightgray'),
+        sg.SetOptions(button_color=('black', 'lightgray'),
                       font=font,
-                      margins=(2,1))
+                      margins=(2, 1))
         layout = self._create_layout()
         self.window = sg.Window(title,
                                 icon=icon,

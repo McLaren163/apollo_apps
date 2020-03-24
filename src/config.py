@@ -21,7 +21,7 @@ FILES = {
     'font-stsev': os.path.join(CWD, 'res', 'fonts', 'STSEV851-78.ttf'),
 }
 
-RIGHT = 'Вправо' 
+RIGHT = 'Вправо'
 LEFT = 'Влево'
 
 NO = 'НЕТ'
